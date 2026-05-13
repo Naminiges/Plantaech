@@ -129,10 +129,12 @@ with tab1:
     col_left, col_right = st.columns(2)
     
     with col_left:
-        # Bar chart distribusi kelas
+        # Bar chart distribusi kelas - Menggunakan highlight color
         fig, ax = plt.subplots(figsize=(10, 6))
         class_counts = filtered_df['disease_name'].value_counts()
-        colors = sns.color_palette("viridis", len(class_counts))
+        base_color = 'lightgray'
+        highlight_color = '#e74c3c'
+        colors = [highlight_color if i == 0 else base_color for i in range(len(class_counts))]
         bars = ax.barh(class_counts.index, class_counts.values, color=colors)
         ax.set_xlabel('Jumlah Sampel', fontsize=12)
         ax.set_ylabel('Jenis Penyakit', fontsize=12)
@@ -144,23 +146,10 @@ with tab1:
         st.pyplot(fig)
     
     with col_right:
-        # Pie chart proporsi
-        fig2, ax2 = plt.subplots(figsize=(10, 6))
-        wedges, texts, autotexts = ax2.pie(
-            class_counts.values, 
-            labels=class_counts.index,
-            autopct='%1.1f%%',
-            colors=colors,
-            pctdistance=0.85,
-            startangle=90
-        )
-        for text in texts:
-            text.set_fontsize(8)
-        for autotext in autotexts:
-            autotext.set_fontsize(7)
-        ax2.set_title('Proporsi Kelas Penyakit', fontsize=14, fontweight='bold')
-        plt.tight_layout()
-        st.pyplot(fig2)
+        # Menghapus Pie Chart karena kategori yang banyak membuat distraksi dan ink-ratio rendah
+        # Digantikan dengan representasi tabel di bawah
+        st.markdown("#### Informasi Proporsi Kelas")
+        st.info("Penyakit " + class_counts.index[0] + " mendominasi dataset dengan " + str(class_counts.values[0]) + " sampel.")
     
     # Tabel distribusi
     st.markdown("#### Tabel Distribusi Kelas")
@@ -204,7 +193,7 @@ with tab2:
         # Distribusi resolusi
         fig4, ax4 = plt.subplots(figsize=(10, 6))
         avg_pixels = filtered_df.groupby('disease_name')['total_pixels'].mean().sort_values()
-        colors4 = sns.color_palette("coolwarm", len(avg_pixels))
+        colors4 = ['#3498db'] * len(avg_pixels)
         ax4.barh(avg_pixels.index, avg_pixels.values / 1000, color=colors4)
         ax4.set_xlabel('Rata-rata Total Pixel (ribuan)', fontsize=12)
         ax4.set_ylabel('Jenis Penyakit', fontsize=12)
