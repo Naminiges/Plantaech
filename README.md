@@ -1,4 +1,4 @@
-# Proyek Analisis Data: Plantaech 🌿
+# Plantaech
 ## Analisis Dataset Penyakit Tanaman Tomat
 
 ## Deskripsi
@@ -108,13 +108,13 @@ Dashboard akan terbuka di browser pada `http://localhost:8501`.
 
 ### Fitur Dashboard
 
-- 📊 **Metric Cards** – Ringkasan dataset (total gambar, jumlah kelas, gambar sehat/sakit, rata-rata ukuran)
-- 📈 **Distribusi Kelas** – Bar chart dan pie chart distribusi jenis penyakit tanaman tomat
-- 🔍 **Analisis Gambar** – Box plot dan bar chart kualitas gambar per kelas penyakit
-- 📊 **Sehat vs Sakit** – Perbandingan visual dan statistik antara gambar tanaman sehat dan sakit
-- 🧪 **A/B Testing** – Independent t-test untuk menguji perbedaan kualitas gambar antara kelompok
-- 📝 **Kesimpulan & Rekomendasi** – Rangkuman insight dan action items
-- 🔍 **Filter Interaktif** – Filter berdasarkan kondisi tanaman, jenis penyakit, dan ukuran file
+- **Metric Cards** – Ringkasan dataset (total gambar, jumlah kelas, gambar sehat/sakit, rata-rata ukuran)
+- **Distribusi Kelas** – Bar chart dan pie chart distribusi jenis penyakit tanaman tomat
+- **Analisis Gambar** – Box plot dan bar chart kualitas gambar per kelas penyakit
+- **Sehat vs Sakit** – Perbandingan visual dan statistik antara gambar tanaman sehat dan sakit
+- **A/B Testing** – Independent t-test untuk menguji perbedaan kualitas gambar antara kelompok
+- **Kesimpulan & Rekomendasi** – Rangkuman insight dan action items
+- **Filter Interaktif** – Filter berdasarkan kondisi tanaman, jenis penyakit, dan ukuran file
 
 ## Teknik Analisis Lanjutan
 
