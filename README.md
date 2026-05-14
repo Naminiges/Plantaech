@@ -1,4 +1,4 @@
-# Proyek Analisis Data: Plantaech 🌿
+# Plantaech
 ## Analisis Dataset Penyakit Tanaman Tomat
 
 ## Deskripsi
@@ -157,11 +157,7 @@ Buka file `notebook.ipynb` menggunakan Jupyter Notebook atau Google Colab, lalu 
 jupyter notebook notebook.ipynb
 ```
 
-> **Catatan:** Pastikan untuk menjalankan seluruh cell di notebook terlebih dahulu agar file `dashboard/main_data.csv` ter-generate. Atau jalankan script berikut:
-
-```bash
-python dashboard/prepare_data.py
-```
+> **Catatan:** Pastikan untuk menjalankan seluruh cell di notebook terlebih dahulu agar file `dashboard/main_data.csv` ter-generate.
 
 ## Menjalankan Dashboard
 
@@ -175,13 +171,13 @@ Dashboard akan terbuka di browser pada `http://localhost:8501`.
 
 ### Fitur Dashboard
 
-- 📊 **Metric Cards** – Ringkasan dataset (total gambar, jumlah kelas, gambar sehat/sakit, rata-rata ukuran)
-- 📈 **Distribusi Kelas** – Bar chart dan pie chart distribusi jenis penyakit tanaman tomat
-- 🔍 **Analisis Gambar** – Box plot dan bar chart kualitas gambar per kelas penyakit
-- 📊 **Sehat vs Sakit** – Perbandingan visual dan statistik antara gambar tanaman sehat dan sakit
-- 🧪 **A/B Testing** – Independent t-test untuk menguji perbedaan kualitas gambar antara kelompok
-- 📝 **Kesimpulan & Rekomendasi** – Rangkuman insight dan action items
-- 🔍 **Filter Interaktif** – Filter berdasarkan kondisi tanaman, jenis penyakit, dan ukuran file
+- **Metric Cards** – Ringkasan dataset (total gambar, jumlah kelas, gambar sehat/sakit, rata-rata ukuran)
+- **Distribusi Kelas** – Bar chart dan pie chart distribusi jenis penyakit tanaman tomat
+- **Analisis Gambar** – Box plot dan bar chart kualitas gambar per kelas penyakit
+- **Sehat vs Sakit** – Perbandingan visual dan statistik antara gambar tanaman sehat dan sakit
+- **A/B Testing** – Independent t-test untuk menguji perbedaan kualitas gambar antara kelompok
+- **Kesimpulan & Rekomendasi** – Rangkuman insight dan action items
+- **Filter Interaktif** – Filter berdasarkan kondisi tanaman, jenis penyakit, dan ukuran file
 
 ## Teknik Analisis Lanjutan
 
