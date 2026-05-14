@@ -1,3 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment files (never commit secrets)
+.env
+server/.env
+client/.env
+
+# Build output
+dist/
+client/dist/
+
+# Uploads (runtime generated)
+server/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
 venv/
 __pycache__/
 .ipynb_checkpoints/

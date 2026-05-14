@@ -36,25 +36,92 @@ Proyek ini merupakan bagian dari Capstone Project **Coding Camp 2026 powered by 
 
 ```
 Plantaech/
+├── client/                         # React + Vite frontend
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── layout/
+│   │   │   │   ├── Navbar.jsx          # Navigasi utama & menu admin
+│   │   │   │   ├── Footer.jsx          # Footer global
+│   │   │   │   └── AdminLayout.jsx     # Wrapper halaman admin
+│   │   │   └── ui/
+│   │   │       ├── ReportModal.jsx     # Modal laporan konten
+│   │   │       └── UploadArea.jsx      # Drag-and-drop upload gambar
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx         # State autentikasi global
+│   │   ├── pages/
+│   │   │   ├── Landing.jsx             # Beranda
+│   │   │   ├── Login.jsx               # Halaman masuk
+│   │   │   ├── Register.jsx            # Daftar akun baru
+│   │   │   ├── Diagnosis.jsx           # Upload & diagnosa AI
+│   │   │   ├── History.jsx             # Riwayat diagnosa
+│   │   │   ├── Community.jsx           # Daftar thread forum
+│   │   │   ├── NewThread.jsx           # Form buat thread baru
+│   │   │   ├── ThreadDetail.jsx        # Detail thread & komentar
+│   │   │   ├── Profile.jsx             # Profil & feed aktivitas pengguna
+│   │   │   └── admin/
+│   │   │       ├── Dashboard.jsx       # Statistik admin
+│   │   │       ├── Users.jsx           # Manajemen pengguna
+│   │   │       ├── Posts.jsx           # Manajemen postingan
+│   │   │       └── Reports.jsx         # Moderasi laporan
+│   │   ├── services/
+│   │   │   ├── api.js                  # Fetch wrapper (base URL, token, error)
+│   │   │   └── index.js                # Semua service (auth, user, forum, dll)
+│   │   ├── App.jsx                     # Routing utama
+│   │   └── index.css                   # Design system & kelas komponen global
+│   ├── .env                            # VITE_API_URL
+│   ├── vite.config.js
+│   └── package.json
+├── server/                         # Express.js backend
+│   ├── seeds/
+│   │   └── adminSeed.js                # Buat akun admin awal
+│   ├── sql/
+│   │   └── schema.sql                  # Skema database Supabase
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── supabase.js             # Klien Supabase (Service Role Key)
+│   │   ├── controllers/
+│   │   │   ├── authController.js       # Register, login, ganti password
+│   │   │   ├── userController.js       # Profil & avatar
+│   │   │   ├── diagnosisController.js  # Upload & analisa AI
+│   │   │   ├── forumController.js      # Thread, komentar, aktivitas pengguna
+│   │   │   ├── reportController.js     # Laporan konten
+│   │   │   └── adminController.js      # Panel admin
+│   │   ├── middleware/
+│   │   │   ├── auth.js                 # Verifikasi JWT
+│   │   │   ├── admin.js                # Cek role admin
+│   │   │   ├── upload.js               # Multer (plant, avatar, thread image)
+│   │   │   └── errorHandler.js         # Global error handler
+│   │   ├── routes/
+│   │   │   ├── auth.js, users.js, diagnoses.js
+│   │   │   ├── forum.js, reports.js, admin.js
+│   │   ├── services/
+│   │   │   └── aiService.js            # Integrasi endpoint model AI
+│   │   └── app.js                      # Entry point Express
+│   ├── uploads/                        # Gambar yang diupload pengguna
+│   ├── .env
+│   ├── .env.example
+│   ├── railway.toml
+│   └── package.json
 ├── dashboard/
-│   ├── main_data.csv           # Dataset metadata yang sudah diolah untuk dashboard
-│   ├── prepare_data.py         # Script untuk mempersiapkan data dashboard
-│   └── dashboard.py            # Script dashboard Streamlit
+│   ├── main_data.csv               # Dataset metadata yang sudah diolah
+│   ├── prepare_data.py             # Script persiapan data
+│   └── dashboard.py                # Script dashboard Streamlit
 ├── dataset/
-│   ├── Tomato_Bacterial_spot/          # 2,127 gambar
-│   ├── Tomato_Early_blight/            # 1,000 gambar
-│   ├── Tomato_Late_blight/             # 1,909 gambar
-│   ├── Tomato_Leaf_Mold/               #   952 gambar
-│   ├── Tomato_Septoria_leaf_spot/      # 1,771 gambar
-│   ├── Tomato_Spider_mites.../         # 1,676 gambar
-│   ├── Tomato_Target_Spot/             # 1,404 gambar
-│   ├── Tomato_Tomato_YellowLeaf.../    # 3,208 gambar
-│   ├── Tomato_Tomato_mosaic_virus/     #   373 gambar
-│   └── Tomato_healthy/                 # 1,591 gambar
-├── notebook.ipynb             # Jupyter Notebook analisis data
-├── README.md                  # Dokumentasi proyek dan Data Dictionary
-├── requirements.txt           # Daftar library yang digunakan
-└── url.txt                    # Link dashboard (jika di-deploy)
+│   ├── Tomato_Bacterial_spot/      # 2,127 gambar
+│   ├── Tomato_Early_blight/        # 1,000 gambar
+│   ├── Tomato_Late_blight/         # 1,909 gambar
+│   ├── Tomato_Leaf_Mold/           #   952 gambar
+│   ├── Tomato_Septoria_leaf_spot/  # 1,771 gambar
+│   ├── Tomato_Spider_mites.../     # 1,676 gambar
+│   ├── Tomato_Target_Spot/         # 1,404 gambar
+│   ├── Tomato_Tomato_YellowLeaf.../ # 3,208 gambar
+│   ├── Tomato_Tomato_mosaic_virus/ #   373 gambar
+│   └── Tomato_healthy/             # 1,591 gambar
+├── notebook.ipynb                  # Jupyter Notebook analisis data
+├── README.md                       # Dokumentasi proyek ini
+├── requirements.txt                # Library Python
+└── url.txt                         # Link dashboard (jika di-deploy)
 ```
 
 ## Instalasi
@@ -126,3 +193,205 @@ Proyek ini menerapkan:
 - **ID Tim CodingCamp:** CC26-PSU258
 - **Tema Capstone:** Sustainable Living & Responsible Consumption
 - **Nama Proyek:** Plantaech
+
+---
+
+## 🌐 Aplikasi Web — Setup Backend & Frontend
+
+Plantaech memiliki aplikasi web full-stack yang dibangun dengan **Express.js** (backend) dan **React + Vite** (frontend).
+
+### Prasyarat
+
+- Node.js v18 atau lebih baru
+- Akun [Supabase](https://supabase.com) dengan project yang sudah dibuat
+
+---
+
+### 1. Setup Backend (`server/`)
+
+#### a. Install dependensi
+
+```bash
+cd server
+npm install
+```
+
+#### b. Konfigurasi environment
+
+Salin file contoh:
+
+```bash
+cp .env.example .env
+```
+
+Isi file `server/.env`:
+
+```env
+PORT=5000
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+
+# Supabase — Settings > API di dashboard Supabase
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-secret-key
+
+# JWT — buat string acak yang panjang
+JWT_SECRET=string_rahasia_panjang_anda
+JWT_EXPIRES_IN=7d
+
+# AI Model
+AI_SERVICE_URL=http://localhost:8000
+```
+
+#### c. Setup database
+
+Buka **Supabase Dashboard → SQL Editor**, lalu jalankan isi file `server/sql/schema.sql`.
+```
+
+#### d. Buat akun admin awal
+
+```bash
+npm run seed
+```
+
+Kredensial admin yang dibuat:
+
+| Field | Nilai |
+|-------|-------|
+| Email | `admin@plantaech.com` |
+| Password | `Plantaech1` |
+| Role | `admin` |
+
+> Untuk mereset password admin yang sudah ada: `npm run seed -- --update`
+
+#### e. Jalankan dev server
+
+```bash
+npm run dev
+```
+
+API berjalan di `http://localhost:5000`.
+
+---
+
+### 2. Setup Frontend (`client/`)
+
+#### a. Install dependensi
+
+```bash
+cd client
+npm install
+```
+
+#### b. Konfigurasi environment
+
+File `client/.env` sudah mengarah ke backend lokal:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Ganti URL ini jika backend di-deploy ke server lain.
+
+#### c. Jalankan dev server
+
+```bash
+npm run dev
+```
+
+Aplikasi berjalan di `http://localhost:5173`.
+
+> ⚠️ Jalankan backend **terlebih dahulu** sebelum frontend.
+
+---
+
+### 3. Referensi Endpoint API
+
+#### Autentikasi
+
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|------|------------|
+| POST | `/api/auth/register` | Tidak | Daftar akun baru |
+| POST | `/api/auth/login` | Tidak | Masuk, mengembalikan JWT |
+| GET | `/api/auth/me` | Ya | Data pengguna yang sedang login |
+| PUT | `/api/auth/password` | Ya | Ganti password |
+
+#### Pengguna
+
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|------|------------|
+| GET | `/api/users/profile` | Ya | Ambil profil |
+| PUT | `/api/users/profile` | Ya | Update profil (nama, nomor HP) |
+| PUT | `/api/users/avatar` | Ya | Ganti foto profil |
+| DELETE | `/api/users/avatar` | Ya | Hapus foto profil |
+
+#### Diagnosa
+
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|------|------------|
+| POST | `/api/diagnoses/upload` | Opsional | Upload gambar & analisa AI |
+| GET | `/api/diagnoses/history` | Ya | Riwayat diagnosa |
+| GET | `/api/diagnoses/:id` | Ya | Detail satu diagnosa |
+
+#### Forum
+
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|------|------------|
+| GET | `/api/forum/threads` | Tidak | Daftar thread (filter: category, search, user_id) |
+| GET | `/api/forum/threads/:id` | Tidak | Detail thread + komentar |
+| POST | `/api/forum/threads` | Ya | Buat thread baru (+ gambar opsional) |
+| PUT | `/api/forum/threads/:id` | Ya | Edit thread (pemilik/admin) |
+| DELETE | `/api/forum/threads/:id` | Ya | Hapus thread (pemilik/admin) |
+| POST | `/api/forum/threads/:id/comments` | Ya | Tambah komentar |
+| DELETE | `/api/forum/comments/:id` | Ya | Hapus komentar (pemilik/admin) |
+| GET | `/api/forum/comments/by-user/:userId` | Tidak | Komentar publik seorang pengguna |
+| GET | `/api/forum/my-threads` | Ya | Thread saya (termasuk yang dihapus) |
+| GET | `/api/forum/my-comments` | Ya | Komentar saya (termasuk yang dihapus) |
+
+#### Laporan
+
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|------|------------|
+| POST | `/api/reports` | Ya | Laporkan konten |
+| GET | `/api/reports` | Ya (Admin) | Daftar laporan |
+| PUT | `/api/reports/:id` | Ya (Admin) | Update status laporan |
+
+#### Admin
+
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|------|------------|
+| GET | `/api/admin/stats` | Ya (Admin) | Statistik keseluruhan |
+| GET | `/api/admin/users` | Ya (Admin) | Daftar pengguna |
+| PUT | `/api/admin/users/:id/role` | Ya (Admin) | Ubah role pengguna |
+| PUT | `/api/admin/users/:id/ban` | Ya (Admin) | Ban/unban pengguna |
+| GET | `/api/admin/posts` | Ya (Admin) | Daftar semua thread |
+| PUT | `/api/admin/posts/:id/pin` | Ya (Admin) | Pin/unpin thread |
+| DELETE | `/api/admin/posts/:id` | Ya (Admin) | Hapus thread |
+
+---
+
+### 4. Menghubungkan Model AI
+
+Backend saat ini menggunakan mock AI service (`server/src/services/aiService.js`).
+Saat model sudah siap, ganti fungsi `analyzeImage` dengan HTTP call ke endpoint FastAPI:
+
+```js
+const form = new FormData();
+form.append('file', fs.createReadStream(imagePath));
+const response = await axios.post(process.env.AI_SERVICE_URL + '/predict', form, {
+  headers: form.getHeaders(),
+});
+return response.data;
+```
+
+Atur `AI_SERVICE_URL` di `.env` ke URL endpoint model yang sudah di-deploy.
+
+---
+
+### 5. Deploy ke Railway
+
+1. Push repo ke GitHub
+2. Buat project baru di Railway → **Deploy from GitHub**
+3. Tambahkan service → set **Root Directory** ke `server`
+4. Tambahkan semua environment variable dari `.env` di dashboard Railway
+5. Untuk frontend: update `VITE_API_URL` ke URL backend Railway, lalu jalankan `npm run build` di dalam `client/`
