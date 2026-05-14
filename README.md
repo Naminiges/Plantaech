@@ -36,6 +36,29 @@ Proyek ini merupakan bagian dari Capstone Project **Coding Camp 2026 powered by 
 
 ```
 Plantaech/
+├── client/                    # React + Vite frontend
+│   ├── src/
+│   │   ├── components/        # Navbar, Footer, AdminLayout, UI components
+│   │   ├── context/           # AuthContext
+│   │   ├── pages/             # Landing, Login, Register, Diagnosis, History, Community, Profile
+│   │   │   └── admin/         # Dashboard, Users, Posts, Reports
+│   │   └── services/          # Axios API layer
+│   ├── .env                   # VITE_API_URL
+│   └── package.json
+├── server/                    # Express.js backend
+│   ├── src/
+│   │   ├── config/            # supabase.js
+│   │   ├── controllers/       # auth, diagnosis, forum, report, admin, user
+│   │   ├── middleware/        # auth, admin, upload, errorHandler
+│   │   ├── routes/            # All API route files
+│   │   └── services/          # aiService.js (mock AI inference)
+│   │   └── app.js             # Express app entry point
+│   ├── seeds/
+│   │   └── adminSeed.js       # Seeds initial admin user
+│   ├── sql/
+│   │   └── schema.sql         # Database schema for Supabase
+│   ├── .env.example           # Environment variables template
+│   └── package.json
 ├── dashboard/
 │   ├── main_data.csv           # Dataset metadata yang sudah diolah untuk dashboard
 │   ├── prepare_data.py         # Script untuk mempersiapkan data dashboard
@@ -130,3 +153,178 @@ Proyek ini menerapkan:
 - **ID Tim CodingCamp:** CC26-PSU258
 - **Tema Capstone:** Sustainable Living & Responsible Consumption
 - **Nama Proyek:** Plantaech
+
+---
+
+## 🌐 Web Application — Backend & Frontend Setup
+
+Plantaech includes a full-stack web application built with **Express.js** (backend) and **React + Vite** (frontend).
+
+### Prerequisites
+
+- Node.js v18+
+- A [Supabase](https://supabase.com) account and project
+
+---
+
+### 1. Backend Setup (`server/`)
+
+#### a. Install dependencies
+
+```bash
+cd server
+npm install
+```
+
+#### b. Configure environment variables
+
+Copy the example file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+Edit `server/.env`:
+
+```env
+PORT=5000
+NODE_ENV=development
+
+# Supabase — from your project's Settings > API
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# JWT — choose a long random secret
+JWT_SECRET=your-super-secret-jwt-key
+
+# AI Model — swap this URL once the real model is deployed
+AI_MODEL_API_URL=http://localhost:8000/predict
+```
+
+#### c. Create the database schema
+
+Open your Supabase project → **SQL Editor** → paste and run the contents of:
+
+```
+server/sql/schema.sql
+```
+
+This creates the `users`, `diagnoses`, `threads`, `comments`, and `reports` tables with indexes and triggers.
+
+#### d. Seed the initial admin user
+
+```bash
+npm run seed
+```
+
+This creates the admin account:
+
+| Field    | Value                 |
+|----------|-----------------------|
+| Email    | `admin@plantaech.com` |
+| Password | `plantaech jaya`      |
+| Role     | `admin`               |
+
+#### e. Start the backend dev server
+
+```bash
+npm run dev
+```
+
+The API will be running at `http://localhost:5000`.  
+Health check: `GET http://localhost:5000/api/health`
+
+---
+
+### 2. Frontend Setup (`client/`)
+
+#### a. Install dependencies
+
+```bash
+cd client
+npm install
+```
+
+#### b. Configure environment variables
+
+The file `client/.env` already points to the local backend:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Update this URL if the backend is deployed elsewhere.
+
+#### c. Start the frontend dev server
+
+```bash
+npm run dev
+```
+
+The app will open at `http://localhost:5173`.
+
+---
+
+### 3. API Endpoints Reference
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | — | Register new user |
+| POST | `/api/auth/login` | — | Login, returns JWT |
+| GET | `/api/auth/me` | ✅ | Get current user |
+| PUT | `/api/auth/password` | ✅ | Change password |
+| POST | `/api/diagnoses/upload` | Optional | Upload & analyze plant image |
+| GET | `/api/diagnoses/history` | ✅ | Get user's diagnosis history |
+| GET | `/api/diagnoses/:id` | ✅ | Get single diagnosis |
+| GET | `/api/forum/threads` | — | List threads (filter by category/tag) |
+| GET | `/api/forum/threads/:id` | — | Get thread + comments |
+| POST | `/api/forum/threads` | ✅ | Create a new thread |
+| POST | `/api/forum/threads/:id/comments` | ✅ | Post a comment |
+| DELETE | `/api/forum/threads/:id` | ✅ | Delete own thread |
+| POST | `/api/reports` | ✅ | Submit a report |
+| GET | `/api/admin/stats` | 👑 Admin | Dashboard stats |
+| GET | `/api/admin/users` | 👑 Admin | List users |
+| PUT | `/api/admin/users/:id/ban` | 👑 Admin | Ban / unban user |
+| PUT | `/api/admin/users/:id/role` | 👑 Admin | Change user role |
+| GET | `/api/admin/posts` | 👑 Admin | List all posts |
+| PUT | `/api/admin/posts/:id/pin` | 👑 Admin | Pin / unpin a post |
+| DELETE | `/api/admin/posts/:id` | 👑 Admin | Remove a post |
+| GET | `/api/reports` | 👑 Admin | View reports queue |
+| PUT | `/api/reports/:id` | 👑 Admin | Resolve / dismiss report |
+
+---
+
+### 4. Connecting the Real AI Model
+
+The backend currently uses a mock AI service (`server/src/services/aiService.js`).  
+When the real model is ready, replace the `analyzeImage` function body with an HTTP call to the FastAPI inference endpoint:
+
+```js
+// server/src/services/aiService.js
+const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
+
+const analyzeImage = async (imagePath) => {
+  const form = new FormData();
+  form.append('file', fs.createReadStream(imagePath));
+  const response = await axios.post(process.env.AI_MODEL_API_URL, form, {
+    headers: form.getHeaders(),
+  });
+  return response.data;
+};
+```
+
+Set `AI_MODEL_API_URL` in `.env` to the deployed model endpoint.
+
+---
+
+### 5. Deploy to Railway
+
+1. Push the repo to GitHub
+2. Create a new Railway project → **Deploy from GitHub**
+3. Add a service → set **Root Directory** to `server`
+4. Add all environment variables from `.env` in Railway's dashboard
+5. For the frontend: update `VITE_API_URL` to the Railway backend URL, run `npm run build` inside `client/` — the static `dist/` folder is served automatically by the backend in production mode (`NODE_ENV=production`)
+

@@ -1,0 +1,62 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const path = require('path');
+const fs = require('fs');
+
+const authRoutes = require('./routes/auth');
+const diagnosisRoutes = require('./routes/diagnoses');
+const forumRoutes = require('./routes/forum');
+const reportRoutes = require('./routes/reports');
+const adminRoutes = require('./routes/admin');
+const userRoutes = require('./routes/users');
+const errorHandler = require('./middleware/errorHandler');
+
+const app = express();
+
+// ── Security & Logging ─────────────────────────────────────────────
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,
+}));
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ── Static uploads ─────────────────────────────────────────────────
+const uploadDir = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+app.use('/uploads', express.static(uploadDir));
+
+// ── API Routes ─────────────────────────────────────────────────────
+app.use('/api/auth', authRoutes);
+app.use('/api/diagnoses', diagnosisRoutes);
+app.use('/api/forum', forumRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/users', userRoutes);
+
+// ── Health Check ───────────────────────────────────────────────────
+app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+// ── Serve built frontend in production ─────────────────────────────
+if (process.env.NODE_ENV === 'production') {
+  const clientBuild = path.join(__dirname, '../../client/dist');
+  app.use(express.static(clientBuild));
+  app.get('*', (req, res) => res.sendFile(path.join(clientBuild, 'index.html')));
+}
+
+// ── Error Handler ──────────────────────────────────────────────────
+app.use(errorHandler);
+
+// ── Start Server ───────────────────────────────────────────────────
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🌿 Plantaech server running on http://localhost:${PORT}`);
+  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+module.exports = app;
