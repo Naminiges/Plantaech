@@ -15,7 +15,7 @@ const requireAuth = async (req, res, next) => {
 
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, first_name, last_name, email, role, is_banned, avatar')
+      .select('id, first_name, last_name, email, role, is_banned, avatar, phone')
       .eq('id', decoded.userId)
       .single();
 
@@ -44,7 +44,7 @@ const optionalAuth = async (req, res, next) => {
 
     const { data: user } = await supabase
       .from('users')
-      .select('id, first_name, last_name, email, role, is_banned, avatar')
+      .select('id, first_name, last_name, email, role, is_banned, avatar, phone')
       .eq('id', decoded.userId)
       .single();
 

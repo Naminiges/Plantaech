@@ -10,7 +10,7 @@ const getThreads = async (req, res, next) => {
     let query = supabase
       .from('threads')
       .select(`
-        id, title, category, tags, is_pinned, created_at, updated_at,
+        id, title, content, image_url, category, tags, is_pinned, created_at, updated_at,
         users!threads_user_id_fkey(id, first_name, last_name, avatar),
         comments(count)
       `, { count: 'exact' })
@@ -20,8 +20,9 @@ const getThreads = async (req, res, next) => {
       .range(from, to);
 
     if (category) query = query.eq('category', category);
-    if (tag) query = query.contains('tags', [tag]);
-    if (search) query = query.ilike('title', `%${search}%`);
+    if (tag)      query = query.contains('tags', [tag]);
+    if (search)   query = query.ilike('title', `%${search}%`);
+    if (req.query.user_id) query = query.eq('user_id', req.query.user_id);
 
     const { data, error, count } = await query;
     if (error) throw error;
@@ -67,17 +68,25 @@ const getThread = async (req, res, next) => {
 // POST /api/forum/threads
 const createThread = async (req, res, next) => {
   try {
-    const { title, content, category, tags } = req.body;
+    const { title, content, category } = req.body;
     if (!title || !content) return res.status(400).json({ error: 'Title and content are required' });
+
+    // tags may arrive as JSON string (when sent via FormData with image)
+    let tags = req.body.tags || [];
+    if (typeof tags === 'string') {
+      try { tags = JSON.parse(tags); } catch { tags = []; }
+    }
 
     const VALID_CATEGORIES = ['penyakit_tanaman', 'tips_pertanian', 'tanya_jawab', 'pupuk_nutrisi', 'hama_pengendalian', 'umum'];
     if (category && !VALID_CATEGORIES.includes(category)) {
       return res.status(400).json({ error: 'Invalid category' });
     }
 
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
     const { data, error } = await supabase
       .from('threads')
-      .insert({ title, content, category: category || 'umum', tags: tags || [], user_id: req.user.id })
+      .insert({ title, content, category: category || 'umum', tags, image_url: imageUrl, user_id: req.user.id })
       .select(`*, users!threads_user_id_fkey(id, first_name, last_name, avatar)`)
       .single();
 
@@ -115,7 +124,7 @@ const deleteThread = async (req, res, next) => {
     if (thread.user_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden' });
     }
-    await supabase.from('threads').update({ is_deleted: true }).eq('id', req.params.id);
+    await supabase.from('threads').update({ is_deleted: true, deleted_by: req.user.id }).eq('id', req.params.id);
     res.json({ message: 'Thread deleted' });
   } catch (err) {
     next(err);
@@ -152,11 +161,60 @@ const deleteComment = async (req, res, next) => {
     if (comment.user_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden' });
     }
-    await supabase.from('comments').update({ is_deleted: true }).eq('id', req.params.id);
+    await supabase.from('comments').update({ is_deleted: true, deleted_by: req.user.id }).eq('id', req.params.id);
     res.json({ message: 'Comment deleted' });
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = { getThreads, getThread, createThread, updateThread, deleteThread, createComment, deleteComment };
+// GET /api/forum/comments/by-user/:userId
+const getUserComments = async (req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .select(`
+        id, content, created_at,
+        threads!comments_thread_id_fkey(id, title, is_deleted)
+      `)
+      .eq('user_id', req.params.userId)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    res.json({ comments: data });
+  } catch (err) { next(err); }
+};
+
+// GET /api/forum/my-threads  (auth-protected, includes deleted for owner's view)
+const getMyThreads = async (req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('threads')
+      .select('id, title, content, is_deleted, deleted_by, category, created_at, comments(count)')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    res.json({ threads: data });
+  } catch (err) { next(err); }
+};
+
+// GET /api/forum/my-comments  (auth-protected, includes deleted for owner's view)
+const getMyComments = async (req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .select(`
+        id, content, is_deleted, deleted_by, created_at,
+        threads!comments_thread_id_fkey(id, title, is_deleted, deleted_by)
+      `)
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    res.json({ comments: data });
+  } catch (err) { next(err); }
+};
+
+module.exports = { getThreads, getThread, createThread, updateThread, deleteThread, createComment, deleteComment, getUserComments, getMyThreads, getMyComments };

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import ReportModal from '../components/ui/ReportModal';
-import { RiAddLine, RiSearchLine, RiFlag2Line, RiChat1Line, RiPushpinLine } from 'react-icons/ri';
+import { RiAddLine, RiSearchLine, RiFlag2Line, RiChat1Line, RiPushpinLine, RiImageLine } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 
 const CATEGORIES = [
@@ -18,23 +18,24 @@ const CATEGORIES = [
   { value: 'umum',              label: 'Umum' },
 ];
 
-const CAT_LABEL = Object.fromEntries(CATEGORIES.map(c=>[c.value, c.label]));
+const CAT_LABEL = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
+const API_BASE  = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
 export default function Community() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [threads, setThreads] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch]   = useState('');
-  const [category, setCategory] = useState('');
-  const [page, setPage]       = useState(1);
-  const [total, setTotal]     = useState(0);
+  const [threads, setThreads]       = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [search, setSearch]         = useState('');
+  const [category, setCategory]     = useState('');
+  const [page, setPage]             = useState(1);
+  const [total, setTotal]           = useState(0);
   const [reportTarget, setReportTarget] = useState(null);
   const limit = 15;
 
   const fetchThreads = () => {
     setLoading(true);
-    forumService.getThreads({ page, limit, category: category||undefined, search: search||undefined })
+    forumService.getThreads({ page, limit, category: category || undefined, search: search || undefined })
       .then(r => { setThreads(r.data.threads); setTotal(r.data.total); })
       .catch(() => toast.error('Failed to load forum'))
       .finally(() => setLoading(false));
@@ -64,61 +65,95 @@ export default function Community() {
             <form onSubmit={handleSearch} className="flex-1 flex gap-2">
               <div className="relative flex-1">
                 <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  id="forum-search" type="text" className="form-input pl-9"
+                <input id="forum-search" type="text" className="form-input pl-9"
                   placeholder="Search discussions..." value={search}
-                  onChange={e=>setSearch(e.target.value)}
-                />
+                  onChange={e => setSearch(e.target.value)} />
               </div>
               <button type="submit" className="btn-outline btn-sm">Search</button>
             </form>
-            <select
-              id="forum-category-filter"
-              className="form-input w-auto"
-              value={category} onChange={e=>{setCategory(e.target.value); setPage(1);}}
-            >
-              {CATEGORIES.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}
+            <select id="forum-category-filter" className="form-input w-auto"
+              value={category} onChange={e => { setCategory(e.target.value); setPage(1); }}>
+              {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
 
-          {/* Thread List */}
+          {/* Thread Cards */}
           {loading ? (
             <div className="flex justify-center py-20"><div className="spinner w-8 h-8"/></div>
           ) : threads.length === 0 ? (
             <div className="text-center py-20 text-gray-400">No discussions found.</div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {threads.map(t => {
-                const user = t.users;
+                const user         = t.users;
                 const commentCount = t.comments?.[0]?.count ?? 0;
+                const imgSrc       = t.image_url
+                  ? (t.image_url.startsWith('http') ? t.image_url : `${API_BASE}${t.image_url}`)
+                  : null;
+
                 return (
-                  <div key={t.id} className="card p-4 flex gap-4 hover:shadow-card transition-shadow">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-2 mb-1">
-                        {t.is_pinned && <RiPushpinLine className="text-xs text-gray-400 flex-shrink-0 mt-0.5" />}
-                        <Link to={`/community/${t.id}`} id={`thread-${t.id}`} className="font-semibold text-sm hover:underline underline-offset-2 line-clamp-2">
-                          {t.title}
+                  <div key={t.id} className="card p-0 overflow-hidden hover:shadow-card transition-shadow">
+                    <div className="flex gap-0">
+
+                      {/* Content side */}
+                      <div className="flex-1 min-w-0 p-4">
+                        {/* Pin + Title */}
+                        <div className="flex items-start gap-2 mb-2">
+                          {t.is_pinned && <RiPushpinLine className="text-xs text-gray-400 flex-shrink-0 mt-0.5" />}
+                          <Link to={`/community/${t.id}`} id={`thread-${t.id}`}
+                            className="font-semibold text-sm hover:underline underline-offset-2 line-clamp-2 leading-snug">
+                            {t.title}
+                          </Link>
+                        </div>
+
+                        {/* Content preview — 3 lines max */}
+                        {t.content && (
+                          <p className="text-xs text-gray-500 line-clamp-3 leading-relaxed mb-2">
+                            {t.content}
+                          </p>
+                        )}
+
+                        {/* Read more */}
+                        <Link to={`/community/${t.id}`}
+                          className="text-xs text-gray-400 hover:text-black transition-colors font-medium mb-3 inline-block">
+                          Read more →
                         </Link>
+
+                        {/* Meta row */}
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                          {t.category && <span className="badge-outline badge">{CAT_LABEL[t.category] || t.category}</span>}
+                          {t.tags?.map(tag => <span key={tag} className="badge-outline badge">{tag}</span>)}
+                          <span>by <span className="text-gray-600 font-medium">{user?.first_name} {user?.last_name}</span></span>
+                          <span>{new Date(t.created_at).toLocaleDateString()}</span>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                        {t.category && <span className="badge-outline badge">{CAT_LABEL[t.category] || t.category}</span>}
-                        {t.tags?.map(tag=><span key={tag} className="badge-outline badge">{tag}</span>)}
-                        <span>by <span className="text-gray-600 font-medium">{user?.first_name} {user?.last_name}</span></span>
-                        <span>{new Date(t.created_at).toLocaleDateString()}</span>
+
+                      {/* Right column: image thumbnail + actions */}
+                      <div className="flex flex-col flex-shrink-0">
+                        {/* Image thumbnail */}
+                        {imgSrc ? (
+                          <Link to={`/community/${t.id}`} className="block w-28 h-full min-h-[7rem]">
+                            <img src={imgSrc} alt="" className="w-full h-full object-cover" />
+                          </Link>
+                        ) : (
+                          <div className="w-12 h-full min-h-[7rem] bg-gray-50 flex items-center justify-center">
+                            <RiImageLine className="text-gray-200 text-lg" />
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    <div className="flex flex-col items-end justify-between flex-shrink-0">
-                      <button
-                        id={`report-thread-${t.id}`}
-                        onClick={()=>setReportTarget({threadId: t.id})}
-                        className="text-gray-300 hover:text-red-400 transition-colors p-1"
-                        title="Report"
-                      >
-                        <RiFlag2Line className="text-sm"/>
-                      </button>
-                      <div className="flex items-center gap-1 text-xs text-gray-400">
-                        <RiChat1Line/> {commentCount}
+
+                      {/* Actions column */}
+                      <div className="flex flex-col items-center justify-between p-3 border-l border-gray-100">
+                        <button id={`report-thread-${t.id}`}
+                          onClick={() => setReportTarget({ threadId: t.id })}
+                          className="text-gray-300 hover:text-red-400 transition-colors p-1" title="Report">
+                          <RiFlag2Line className="text-sm"/>
+                        </button>
+                        <div className="flex items-center gap-1 text-xs text-gray-400">
+                          <RiChat1Line/> {commentCount}
+                        </div>
                       </div>
+
                     </div>
                   </div>
                 );
@@ -128,15 +163,15 @@ export default function Community() {
 
           {total > limit && (
             <div className="flex justify-center gap-3 mt-8">
-              <button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="btn-outline btn-sm disabled:opacity-40">← Previous</button>
+              <button disabled={page<=1} onClick={() => setPage(p=>p-1)} className="btn-outline btn-sm disabled:opacity-40">← Previous</button>
               <span className="text-sm text-gray-500 self-center">Page {page} of {Math.ceil(total/limit)}</span>
-              <button disabled={page>=Math.ceil(total/limit)} onClick={()=>setPage(p=>p+1)} className="btn-outline btn-sm disabled:opacity-40">Next →</button>
+              <button disabled={page>=Math.ceil(total/limit)} onClick={() => setPage(p=>p+1)} className="btn-outline btn-sm disabled:opacity-40">Next →</button>
             </div>
           )}
         </div>
       </main>
       <Footer />
-      <ReportModal isOpen={!!reportTarget} onClose={()=>setReportTarget(null)} threadId={reportTarget?.threadId} />
+      <ReportModal isOpen={!!reportTarget} onClose={() => setReportTarget(null)} threadId={reportTarget?.threadId} />
     </div>
   );
 }

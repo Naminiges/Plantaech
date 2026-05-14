@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS threads (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   content TEXT NOT NULL,
+  image_url TEXT,
   category TEXT CHECK (category IN (
     'penyakit_tanaman', 'tips_pertanian', 'tanya_jawab',
     'pupuk_nutrisi', 'hama_pengendalian', 'umum'
@@ -45,16 +46,20 @@ CREATE TABLE IF NOT EXISTS threads (
   tags TEXT[],
   is_pinned BOOLEAN DEFAULT false,
   is_deleted BOOLEAN DEFAULT false,
+  deleted_by UUID REFERENCES users(id),   -- NULL = self-deleted, set = admin removed
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+-- If the threads table already exists, run this in Supabase SQL editor:
+-- ALTER TABLE threads ADD COLUMN IF NOT EXISTS image_url TEXT;
 
 -- Comments
 CREATE TABLE IF NOT EXISTS comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   content TEXT NOT NULL,
   is_deleted BOOLEAN DEFAULT false,
+  deleted_by UUID REFERENCES users(id),   -- NULL = self-deleted, set = admin removed
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   thread_id UUID NOT NULL REFERENCES threads(id) ON DELETE CASCADE,
   parent_id UUID REFERENCES comments(id) ON DELETE CASCADE,

@@ -27,10 +27,16 @@ const uploadPlant = multer({
   limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 10 * 1024 * 1024 },
 }).single('image');
 
+const uploadThreadImage = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB for forum images
+}).single('image');
+
 const uploadAvatar = multer({
   storage,
   fileFilter,
   limits: { fileSize: 2 * 1024 * 1024 },
 }).single('avatar');
 
-module.exports = { uploadPlant, uploadAvatar };
+module.exports = { uploadPlant, uploadAvatar, uploadThreadImage };

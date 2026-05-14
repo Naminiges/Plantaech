@@ -45,9 +45,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
-  const updateUser = useCallback((updatedUser) => {
-    setUser(updatedUser);
-    localStorage.setItem('plantaech_user', JSON.stringify(updatedUser));
+  const updateUser = useCallback((updatedFields) => {
+    setUser(prev => {
+      const merged = { ...prev, ...updatedFields };
+      localStorage.setItem('plantaech_user', JSON.stringify(merged));
+      return merged;
+    });
   }, []);
 
   return (

@@ -19,10 +19,12 @@ export default function ThreadDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
 
+  const [notFound, setNotFound] = useState(false);
+
   useEffect(() => {
     forumService.getThread(id)
       .then(r => { setThread(r.data.thread); setComments(r.data.comments); })
-      .catch(() => { toast.error('Thread not found'); navigate('/community'); })
+      .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -59,6 +61,21 @@ export default function ThreadDetail() {
 
   if (loading) return <div className="min-h-screen flex flex-col"><Navbar /><div className="flex-1 flex items-center justify-center" style={{paddingTop:'var(--nav-height)'}}><div className="spinner w-8 h-8"/></div></div>;
 
+  if (notFound) return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-1 flex items-center justify-center" style={{paddingTop:'var(--nav-height)'}}>
+        <div className="text-center py-20 max-w-sm">
+          <p className="text-5xl mb-4">🗑️</p>
+          <h1 className="text-xl font-bold mb-2">Thread Removed</h1>
+          <p className="text-sm text-gray-500 mb-6">This thread has been deleted and is no longer available.</p>
+          <Link to="/community" className="btn-primary btn-sm">← Back to Community</Link>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -84,6 +101,18 @@ export default function ThreadDetail() {
                 </div>
               </div>
               <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed mb-4">{thread.content}</p>
+
+              {/* Attached image */}
+              {thread.image_url && (() => {
+                const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+                const src = thread.image_url.startsWith('http') ? thread.image_url : `${API_BASE}${thread.image_url}`;
+                return (
+                  <div className="mb-4 border border-gray-100 rounded overflow-hidden">
+                    <img src={src} alt="Thread attachment" className="w-full max-h-[32rem] object-contain bg-gray-50" />
+                  </div>
+                );
+              })()}
+
               <div className="flex items-center gap-2 text-xs text-gray-400 pt-4 border-t border-gray-100">
                 <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold">
                   {thread.users?.first_name?.[0]}

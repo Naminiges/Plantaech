@@ -1,6 +1,9 @@
 const supabase = require('../config/supabase');
 const path = require('path');
 
+const PHONE_REGEX = /^(\+62|62|0)8[1-9][0-9]{6,10}$/;
+const normalizePhone = (p) => p ? p.replace(/[\s\-]/g, '') : null;
+
 // GET /api/users/profile
 const getProfile = async (req, res) => {
   const { data } = await supabase
@@ -14,6 +17,9 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res, next) => {
   try {
     const { first_name, last_name, phone } = req.body;
+    if (phone && !PHONE_REGEX.test(normalizePhone(phone))) {
+      return res.status(400).json({ error: 'Invalid phone number. Use 081x or +62 81x format' });
+    }
     const { data, error } = await supabase
       .from('users')
       .update({ first_name, last_name, phone })
@@ -41,4 +47,16 @@ const updateAvatar = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, updateAvatar };
+// DELETE /api/users/avatar
+const removeAvatar = async (req, res, next) => {
+  try {
+    const { error } = await supabase
+      .from('users').update({ avatar: null }).eq('id', req.user.id);
+    if (error) throw error;
+    res.json({ user: { avatar: null } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { getProfile, updateProfile, updateAvatar, removeAvatar };

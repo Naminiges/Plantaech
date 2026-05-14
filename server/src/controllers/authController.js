@@ -2,6 +2,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const supabase = require('../config/supabase');
 
+const PHONE_REGEX = /^(\+62|62|0)8[1-9][0-9]{6,10}$/;
+const normalizePhone = (p) => p ? p.replace(/[\s\-]/g, '') : null;
+
+// Min 8 chars, at least 1 uppercase letter, at least 1 number
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
 const generateToken = (userId) =>
   jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
@@ -15,6 +21,12 @@ const register = async (req, res, next) => {
     if (password.length < 8) {
       return res.status(400).json({ error: 'Password must be at least 8 characters' });
     }
+    if (!PASSWORD_REGEX.test(password)) {
+      return res.status(400).json({ error: 'Password must contain at least 1 uppercase letter and 1 number' });
+    }
+    if (phone && !PHONE_REGEX.test(normalizePhone(phone))) {
+      return res.status(400).json({ error: 'Invalid phone number. Use 081x or +62 81x format' });
+    }
 
     const { data: existing } = await supabase.from('users').select('id').eq('email', email).single();
     if (existing) return res.status(409).json({ error: 'Email already registered' });
@@ -23,7 +35,7 @@ const register = async (req, res, next) => {
     const { data: user, error } = await supabase
       .from('users')
       .insert({ first_name, last_name, email, password: hashed, phone: phone || null })
-      .select('id, first_name, last_name, email, role, avatar, created_at')
+      .select('id, first_name, last_name, email, phone, role, avatar, created_at')
       .single();
 
     if (error) throw error;
@@ -42,7 +54,7 @@ const login = async (req, res, next) => {
 
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, first_name, last_name, email, password, role, avatar, is_banned')
+      .select('id, first_name, last_name, email, phone, password, role, avatar, is_banned')
       .eq('email', email)
       .single();
 
@@ -74,6 +86,9 @@ const changePassword = async (req, res, next) => {
     }
     if (new_password.length < 8) {
       return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    }
+    if (!PASSWORD_REGEX.test(new_password)) {
+      return res.status(400).json({ error: 'Password must contain at least 1 uppercase letter and 1 number' });
     }
 
     const { data: user } = await supabase

@@ -14,6 +14,9 @@ export default function Register() {
 
   const set = (k, v) => { setForm(f => ({...f, [k]: v})); setErrors(e => ({...e, [k]: ''})); };
 
+  const phoneRegex = /^(\+62|62|0)8[1-9][0-9]{6,10}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
   const validate = () => {
     const e = {};
     if (!form.first_name) e.first_name = 'Required';
@@ -21,7 +24,10 @@ export default function Register() {
     if (!form.email)      e.email      = 'Required';
     if (!form.password)   e.password   = 'Required';
     else if (form.password.length < 8) e.password = 'At least 8 characters';
+    else if (!passwordRegex.test(form.password)) e.password = 'Must include 1 uppercase letter and 1 number';
     if (form.password !== form.confirm) e.confirm = 'Passwords do not match';
+    if (form.phone && !phoneRegex.test(form.phone.replace(/[\s\-]/g, '')))
+      e.phone = 'Enter a valid Indonesian number (e.g. 081x or +62 81x)';
     return e;
   };
 
@@ -71,8 +77,9 @@ export default function Register() {
                   <input id="reg-email" type="email" className="form-input" placeholder="name@example.com" value={form.email} onChange={e=>set('email',e.target.value)} />
                   {errors.email && <p className="form-error">{errors.email}</p>}
                 </div>
-                <div><label className="form-label">Phone number</label>
-                  <input id="reg-phone" type="tel" className="form-input" placeholder="+62 XXX-XXXX-XXXX" value={form.phone} onChange={e=>set('phone',e.target.value)} />
+                <div><label className="form-label">Phone number <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <input id="reg-phone" type="tel" className="form-input" placeholder="081x or +62 81x" value={form.phone} onChange={e=>set('phone',e.target.value)} />
+                  {errors.phone && <p className="form-error">{errors.phone}</p>}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -83,7 +90,7 @@ export default function Register() {
                       {showPw?<RiEyeOffLine/>:<RiEyeLine/>}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">At least 8 characters with a number</p>
+                  <p className="text-xs text-gray-400 mt-1">Min 8 chars, 1 uppercase, 1 number</p>
                   {errors.password && <p className="form-error">{errors.password}</p>}
                 </div>
                 <div><label className="form-label">Confirm password</label>

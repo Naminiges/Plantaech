@@ -23,8 +23,9 @@ const request = async (method, path, body) => {
     throw err;
   }
 
-  // Auto-logout on 401
-  if (res.status === 401) {
+  // Auto-logout on 401 only when we had a token (expired session).
+  // If no token was sent, 401 means wrong credentials — let the error propagate normally.
+  if (res.status === 401 && localStorage.getItem('plantaech_token')) {
     localStorage.removeItem('plantaech_token');
     localStorage.removeItem('plantaech_user');
     window.location.href = '/login';

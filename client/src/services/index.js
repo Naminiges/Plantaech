@@ -15,6 +15,7 @@ export const userService = {
     form.append('avatar', file);
     return api.put('/users/avatar', form);
   },
+  removeAvatar: () => api.delete('/users/avatar'),
 };
 
 export const diagnosisService = {
@@ -30,11 +31,26 @@ export const diagnosisService = {
 export const forumService = {
   getThreads:    (params) => api.get('/forum/threads', { params }),
   getThread:     (id)     => api.get(`/forum/threads/${id}`),
-  createThread:  (data)   => api.post('/forum/threads', data),
+  createThread:  (data, image) => {
+    if (image) {
+      const form = new FormData();
+      form.append('title', data.title);
+      form.append('content', data.content);
+      form.append('category', data.category || 'umum');
+      form.append('tags', JSON.stringify(data.tags || []));
+      form.append('image', image);
+      return api.post('/forum/threads', form);
+    }
+    return api.post('/forum/threads', data);
+  },
   updateThread:  (id, data) => api.put(`/forum/threads/${id}`, data),
   deleteThread:  (id)     => api.delete(`/forum/threads/${id}`),
   createComment: (threadId, data) => api.post(`/forum/threads/${threadId}/comments`, data),
   deleteComment: (id)     => api.delete(`/forum/comments/${id}`),
+  getUserThreads:  (userId) => api.get('/forum/threads', { params: { user_id: userId, limit: 50 } }),
+  getUserComments: (userId) => api.get(`/forum/comments/by-user/${userId}`),
+  getMyThreads:  () => api.get('/forum/my-threads'),
+  getMyComments: () => api.get('/forum/my-comments'),
 };
 
 export const reportService = {

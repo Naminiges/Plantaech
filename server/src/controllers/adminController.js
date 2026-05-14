@@ -112,7 +112,7 @@ const pinPost = async (req, res, next) => {
 // DELETE /api/admin/posts/:id
 const deletePost = async (req, res, next) => {
   try {
-    await supabase.from('threads').update({ is_deleted: true }).eq('id', req.params.id);
+    await supabase.from('threads').update({ is_deleted: true, deleted_by: req.user.id }).eq('id', req.params.id);
     res.json({ message: 'Post removed' });
   } catch (err) {
     next(err);
