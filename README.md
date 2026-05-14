@@ -1,4 +1,4 @@
-# Proyek Analisis Data: Plantaech 🌿
+# Plantaech
 ## Analisis Dataset Penyakit Tanaman Tomat
 
 ## Deskripsi
