@@ -46,23 +46,26 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col border-t border-gray-200">
-      <div className="border-b border-gray-200 py-4 px-6">
-        <Link to="/" className="flex items-center gap-2 font-black text-sm tracking-tight w-fit"><RiPlantLine /> PLANTAECH</Link>
+    <div className="min-h-screen flex bg-brand-primary-light relative">
+      <div className="absolute top-0 right-0 z-10 py-6 px-8 lg:left-1/2 lg:right-auto">
+        <Link to="/" className="flex items-center gap-2 font-black text-xl tracking-tight w-fit text-brand-secondary">
+          <RiPlantLine className="text-brand-accent text-3xl" /> PLANTAECH
+        </Link>
       </div>
-      <div className="flex-1 flex">
-        <div className="hidden lg:flex w-64 bg-gray-50 border-r border-gray-200 items-center justify-center flex-shrink-0">
-          <div className="text-center">
-            <div className="w-20 h-20 border-2 border-dashed border-gray-300 flex items-center justify-center mx-auto mb-3">
-              <RiPlantLine className="text-3xl text-gray-300" />
-            </div>
-            <p className="text-xs text-gray-300 uppercase tracking-widest">Join Plantaech</p>
+      <div className="flex-1 flex flex-col lg:flex-row w-full">
+        <div className="hidden lg:block lg:w-1/2 relative">
+          <img src="/images/auth-bg.png" alt="Modern Greenhouse" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-brand-secondary/30 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-secondary/90 via-transparent to-transparent"></div>
+          <div className="absolute bottom-12 left-12 right-12">
+            <h2 className="text-white text-3xl font-bold mb-3 drop-shadow-md">Join the Revolution.</h2>
+            <p className="text-white/90 text-lg max-w-md drop-shadow">Create an account to access advanced plant diagnostics and a thriving community.</p>
           </div>
         </div>
-        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto">
-          <div className="w-full max-w-lg animate-slide-up">
-            <h1 className="text-3xl font-black mb-1">Sign up</h1>
-            <p className="text-sm text-gray-500 mb-8">Please enter your details. We'll never share your email.</p>
+        <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto relative z-10">
+          <div className="w-full max-w-lg animate-slide-up bg-white p-10 rounded-3xl shadow-xl border border-gray-100 mt-10 lg:mt-0">
+            <h1 className="text-3xl font-black mb-2 text-brand-secondary">Sign up</h1>
+            <p className="text-sm text-gray-500 mb-8 font-medium">Please enter your details. We'll never share your email.</p>
             <form onSubmit={handleSubmit} id="register-form" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 {[['reg-first','First name','first_name'],['reg-last','Last name','last_name']].map(([id,lbl,k])=>(
@@ -98,8 +101,8 @@ export default function Register() {
                   {errors.confirm && <p className="form-error">{errors.confirm}</p>}
                 </div>
               </div>
-              <p className="text-xs text-gray-500">Already have an account? <Link to="/login" className="font-semibold text-black hover:underline">Click Login</Link></p>
-              <div className="flex gap-3 pt-2">
+              <p className="text-sm text-gray-500 font-medium">Already have an account? <Link to="/login" className="font-bold text-brand-secondary hover:text-brand-accent transition-colors">Click Login</Link></p>
+              <div className="flex gap-3 pt-4">
                 <button type="button" id="cancel-register-btn" onClick={()=>navigate(-1)} className="btn-outline">Cancel</button>
                 <button type="submit" id="create-account-btn" disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
                   {loading && <span className="spinner w-4 h-4 border-white border-t-transparent"/>} Create account
@@ -107,13 +110,6 @@ export default function Register() {
               </div>
             </form>
           </div>
-        </div>
-      </div>
-      <div className="border-t border-gray-200 py-3 px-6 flex items-center justify-between">
-        <p className="text-xs text-gray-400">© 2026 Plantaech</p>
-        <div className="flex gap-4 text-xs text-gray-400">
-          <Link to="/terms">Terms of Service</Link>
-          <Link to="/privacy">Privacy Policy</Link>
         </div>
       </div>
     </div>

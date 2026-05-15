@@ -39,20 +39,20 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col border-t border-gray-200">
+    <div className="min-h-screen flex bg-brand-primary-light relative">
       {/* Minimal header */}
-      <div className="border-b border-gray-200 py-4 px-6">
-        <Link to="/" className="flex items-center gap-2 font-black text-sm tracking-tight w-fit">
-          <RiPlantLine /> PLANTAECH
+      <div className="absolute top-0 left-0 z-10 py-6 px-8">
+        <Link to="/" className="flex items-center gap-2 font-black text-xl tracking-tight w-fit text-brand-secondary">
+          <RiPlantLine className="text-brand-accent text-3xl" /> PLANTAECH
         </Link>
       </div>
 
-      <div className="flex-1 flex">
+      <div className="flex-1 flex flex-col lg:flex-row w-full">
         {/* Form side */}
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="w-full max-w-sm animate-slide-up">
-            <h1 className="text-3xl font-black mb-1">Log in</h1>
-            <p className="text-sm text-gray-500 mb-8">Give your email to continue. We'll never share your info.</p>
+        <div className="flex-1 flex items-center justify-center p-8 relative z-10">
+          <div className="w-full max-w-sm animate-slide-up bg-white p-10 rounded-3xl shadow-xl border border-gray-100">
+            <h1 className="text-3xl font-black mb-2 text-brand-secondary">Welcome Back</h1>
+            <p className="text-sm text-gray-500 mb-8 font-medium">Please enter your details to sign in.</p>
 
             <form onSubmit={handleSubmit} className="space-y-4" id="login-form">
               <div>
@@ -81,9 +81,9 @@ export default function Login() {
                 {errors.password && <p className="form-error">{errors.password}</p>}
               </div>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-sm text-gray-500 text-center font-medium">
                 Don't have an account?{' '}
-                <Link to="/register" className="font-semibold text-black underline-offset-2 hover:underline">Sign Up</Link>
+                <Link to="/register" className="font-bold text-brand-secondary hover:text-brand-accent transition-colors">Sign Up</Link>
               </p>
 
               <div className="flex gap-3 pt-2">
@@ -98,23 +98,14 @@ export default function Login() {
         </div>
 
         {/* Decorative side */}
-        <div className="hidden lg:flex flex-1 bg-gray-50 border-l border-gray-200 items-center justify-center">
-          <div className="text-center">
-            <div className="w-24 h-24 border-2 border-dashed border-gray-300 flex items-center justify-center mx-auto mb-4">
-              <RiPlantLine className="text-4xl text-gray-300" />
-            </div>
-            <p className="text-xs text-gray-300 uppercase tracking-widest">Plantaech</p>
+        <div className="hidden lg:block lg:w-1/2 relative">
+          <img src="/images/auth-bg.png" alt="Modern Greenhouse" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-brand-secondary/20 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-secondary/80 via-transparent to-transparent"></div>
+          <div className="absolute bottom-12 left-12 right-12">
+            <h2 className="text-white text-3xl font-bold mb-3 drop-shadow-md">Diagnostic Precision<br/>for Agriculture.</h2>
+            <p className="text-white/90 text-lg max-w-md drop-shadow">Empowering farmers with AI-driven insights and instant disease detection.</p>
           </div>
-        </div>
-      </div>
-
-      {/* Footer row */}
-      <div className="border-t border-gray-200 py-3 px-6 flex items-center justify-between">
-        <p className="text-xs text-gray-400">© 2026 Plantaech</p>
-        <div className="flex gap-4 text-xs text-gray-400">
-          <Link to="/terms">Terms of Service</Link>
-          <Link to="/privacy">Privacy Policy</Link>
-          <a href="mailto:plantaech@example.com">Contact Information</a>
         </div>
       </div>
     </div>
