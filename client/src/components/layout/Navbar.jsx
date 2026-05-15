@@ -16,21 +16,21 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200" style={{ height: 'var(--nav-height)' }}>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-secondary border-b border-white/10 shadow-sm" style={{ height: 'var(--nav-height)' }}>
       <div className="page-container h-full flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 font-black text-lg tracking-tight">
-          <RiPlantLine className="text-black text-xl" />
+        <Link to="/" className="flex items-center gap-2 font-black text-xl tracking-tight text-white">
+          <RiPlantLine className="text-brand-accent text-3xl" />
           PLANTAECH
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-6">
           <NavLink to="/"          end className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>Home</NavLink>
-          <NavLink to="/community"     className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>Community</NavLink>
           {isAuthenticated && (
             <NavLink to="/history"   className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>History</NavLink>
           )}
+          <NavLink to="/community"     className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>Community</NavLink>
         </div>
 
         {/* Desktop Right */}
@@ -39,11 +39,11 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setDropOpen(!dropOpen)}
-                className="flex items-center gap-2 text-sm font-medium hover:text-gray-600 transition-colors"
+                className="flex items-center gap-2 text-sm font-medium text-white hover:text-brand-accent transition-colors"
               >
                 {user?.avatar
-                  ? <img src={user.avatar} className="w-7 h-7 rounded-full object-cover border border-gray-200" alt="avatar" />
-                  : <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">{user?.first_name?.[0]}</div>
+                  ? <img src={user.avatar} className="w-8 h-8 rounded-full object-cover border-2 border-brand-accent" alt="avatar" />
+                  : <div className="w-8 h-8 rounded-full bg-brand-accent text-brand-secondary flex items-center justify-center text-xs font-bold">{user?.first_name?.[0]}</div>
                 }
                 <span>{user?.first_name}</span>
               </button>
@@ -70,24 +70,26 @@ export default function Navbar() {
         </div>
 
         {/* Mobile menu button */}
-        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <RiCloseLine className="text-xl" /> : <RiMenuLine className="text-xl" />}
+        <button className="md:hidden text-white hover:text-brand-accent transition-colors" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <RiCloseLine className="text-2xl" /> : <RiMenuLine className="text-2xl" />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 animate-slide-down">
-          <div className="page-container py-4 flex flex-col gap-3">
-            <NavLink to="/" end onClick={() => setMenuOpen(false)} className="text-sm font-medium">Home</NavLink>
-            <NavLink to="/community" onClick={() => setMenuOpen(false)} className="text-sm font-medium">Community</NavLink>
-            {isAuthenticated && <NavLink to="/history" onClick={() => setMenuOpen(false)} className="text-sm font-medium">History</NavLink>}
-            {isAuthenticated && <NavLink to="/profile" onClick={() => setMenuOpen(false)} className="text-sm font-medium">Profile</NavLink>}
-            {isAdmin && <NavLink to="/admin" onClick={() => setMenuOpen(false)} className="text-sm font-medium">Admin Panel</NavLink>}
-            {isAuthenticated
-              ? <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="text-sm font-medium text-red-600 text-left">Log out</button>
-              : <Link to="/login" onClick={() => setMenuOpen(false)} className="btn-primary w-fit">LOGIN</Link>
-            }
+        <div className="md:hidden bg-brand-secondary border-t border-white/10 animate-slide-down shadow-xl">
+          <div className="page-container py-6 flex flex-col gap-4">
+            <NavLink to="/" end onClick={() => setMenuOpen(false)} className={({isActive}) => `text-sm font-semibold tracking-wide ${isActive ? 'text-brand-accent' : 'text-white/80 hover:text-white'}`}>Home</NavLink>
+            {isAuthenticated && <NavLink to="/history" onClick={() => setMenuOpen(false)} className={({isActive}) => `text-sm font-semibold tracking-wide ${isActive ? 'text-brand-accent' : 'text-white/80 hover:text-white'}`}>History</NavLink>}
+            <NavLink to="/community" onClick={() => setMenuOpen(false)} className={({isActive}) => `text-sm font-semibold tracking-wide ${isActive ? 'text-brand-accent' : 'text-white/80 hover:text-white'}`}>Community</NavLink>
+            {isAuthenticated && <NavLink to="/profile" onClick={() => setMenuOpen(false)} className={({isActive}) => `text-sm font-semibold tracking-wide ${isActive ? 'text-brand-accent' : 'text-white/80 hover:text-white'}`}>Profile</NavLink>}
+            {isAdmin && <NavLink to="/admin" onClick={() => setMenuOpen(false)} className={({isActive}) => `text-sm font-semibold tracking-wide ${isActive ? 'text-brand-accent' : 'text-white/80 hover:text-white'}`}>Admin Panel</NavLink>}
+            <div className="pt-4 mt-2 border-t border-white/10">
+              {isAuthenticated
+                ? <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="text-sm font-semibold text-brand-danger text-left">Log out</button>
+                : <Link to="/login" onClick={() => setMenuOpen(false)} className="btn-primary w-fit">LOGIN</Link>
+              }
+            </div>
           </div>
         </div>
       )}
