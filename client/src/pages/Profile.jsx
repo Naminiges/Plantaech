@@ -154,18 +154,18 @@ export default function Profile() {
       <Navbar />
       <main className="flex-1" style={{paddingTop:'var(--nav-height)'}}>
         <div className="page-container py-12 max-w-2xl">
-          <h1 className="heading-section mb-8">PROFILE</h1>
+          <h1 className="text-3xl font-black text-brand-secondary mb-8">PROFILE</h1>
 
           {/* ── Profile card ───────────────────────────────── */}
-          <div className="card p-6 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <div className="flex items-center gap-5">
                 {/* Avatar — clickable when editing */}
                 <div className="relative flex-shrink-0">
                   <div
                     onClick={() => editing && avatarConfirm === 'idle' && avatarInputRef.current?.click()}
-                    className={`w-14 h-14 rounded-full overflow-hidden bg-black text-white flex items-center justify-center text-xl font-black select-none transition-opacity ${
-                      editing ? 'cursor-pointer' : ''
+                    className={`w-20 h-20 rounded-full overflow-hidden bg-brand-primary-light text-brand-secondary flex items-center justify-center text-3xl font-black select-none transition-opacity ${
+                      editing ? 'cursor-pointer hover:opacity-80' : ''
                     } ${avatarUploading ? 'opacity-50' : ''}`}
                   >
                     {/* Show pending preview if in upload-confirm state */}
@@ -181,7 +181,7 @@ export default function Profile() {
                       type="button"
                       onClick={() => avatarInputRef.current?.click()}
                       disabled={avatarUploading}
-                      className="absolute -bottom-1 -right-1 w-5 h-5 bg-black text-white rounded-full flex items-center justify-center shadow"
+                      className="absolute bottom-0 right-0 w-7 h-7 bg-brand-secondary text-white rounded-full flex items-center justify-center shadow-md border-2 border-white hover:bg-brand-accent transition-colors"
                       title="Change avatar"
                     >
                       {avatarUploading
@@ -198,40 +198,39 @@ export default function Profile() {
                   />
                 </div>
                 <div>
-                  <p className="font-bold text-base">{user?.first_name} {user?.last_name}</p>
-                  <p className="text-sm text-gray-500">{user?.email}</p>
-                  <span className={`badge mt-1 ${user?.role === 'admin' ? 'badge-black' : 'badge-outline'}`}>{user?.role}</span>
+                  <p className="font-black text-xl text-brand-secondary">{user?.first_name} {user?.last_name}</p>
+                  <p className="text-sm text-gray-500 font-medium mb-2">{user?.email}</p>
+                  <span className={`badge ${user?.role === 'admin' ? 'bg-brand-accent text-white border-brand-accent' : 'bg-brand-primary-light text-brand-secondary border-brand-primary-light'}`}>{user?.role}</span>
                 </div>
               </div>
-              <button onClick={openEdit} className="btn-outline btn-sm flex items-center gap-1.5">
-                <RiEditLine /> Edit
+              <button onClick={openEdit} className="btn-outline rounded-full px-5 py-2 flex items-center gap-2 flex-shrink-0">
+                <RiEditLine className="text-lg" /> Edit Profile
               </button>
             </div>
 
-            {/* Read-only info row */}
             {!editing && (
-              <div className="grid grid-cols-2 gap-4 text-sm mt-5 pt-5 border-t border-gray-100">
-                <div><p className="text-gray-400 text-xs uppercase tracking-wider mb-1">First Name</p><p>{user?.first_name}</p></div>
-                <div><p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Last Name</p><p>{user?.last_name}</p></div>
-                <div><p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Email</p><p>{user?.email}</p></div>
-                <div><p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Phone</p><p>{user?.phone || '—'}</p></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm mt-8 pt-8 border-t border-gray-100">
+                <div><p className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-1.5">First Name</p><p className="font-medium text-gray-700">{user?.first_name}</p></div>
+                <div><p className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-1.5">Last Name</p><p className="font-medium text-gray-700">{user?.last_name}</p></div>
+                <div><p className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-1.5">Email</p><p className="font-medium text-gray-700">{user?.email}</p></div>
+                <div><p className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-1.5">Phone</p><p className="font-medium text-gray-700">{user?.phone || '—'}</p></div>
               </div>
             )}
           </div>
 
           {/* ── Edit overlay panel ─────────────────────────── */}
           {editing && (
-            <div className="card p-6 mb-6 border-2 border-black animate-slide-up">
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="font-bold text-sm uppercase tracking-wider">Edit Profile</h2>
-                <button onClick={() => { setEditing(false); cancelAvatarConfirm(); }} className="text-gray-400 hover:text-black transition-colors">
-                  <RiCloseLine className="text-lg" />
+            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 animate-slide-up mb-8 relative">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                <h2 className="font-black text-xl text-brand-secondary uppercase">Edit Profile</h2>
+                <button onClick={() => { setEditing(false); cancelAvatarConfirm(); }} className="p-2 text-gray-400 hover:text-brand-danger bg-gray-50 hover:bg-red-50 rounded-full transition-colors absolute top-6 right-6">
+                  <RiCloseLine className="text-xl" />
                 </button>
               </div>
 
               {/* ─ Avatar management ─ */}
               <div className="mb-5 pb-5 border-b border-gray-100">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Profile Photo</p>
+                <p className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-4">Profile Photo</p>
 
                 {/* Upload confirmation */}
                 {avatarConfirm === 'upload' && (
@@ -242,8 +241,8 @@ export default function Profile() {
                       <p className="text-xs text-gray-400">This will replace your current profile photo.</p>
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
-                      <button onClick={cancelAvatarConfirm} className="btn-outline btn-sm text-xs">Cancel</button>
-                      <button onClick={confirmUpload} disabled={avatarUploading} className="btn-primary btn-sm text-xs disabled:opacity-50">
+                      <button onClick={cancelAvatarConfirm} className="btn-outline btn-sm rounded-full px-4 text-xs">Cancel</button>
+                      <button onClick={confirmUpload} disabled={avatarUploading} className="btn-primary btn-sm rounded-full px-4 text-xs disabled:opacity-50">
                         {avatarUploading ? <span className="spinner w-3 h-3 border-white border-t-transparent" /> : 'Confirm'}
                       </button>
                     </div>
@@ -258,8 +257,8 @@ export default function Profile() {
                       <p className="text-xs text-red-500">Your initials will be shown instead.</p>
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
-                      <button onClick={() => setAvatarConfirm('idle')} className="btn-outline btn-sm text-xs">Cancel</button>
-                      <button onClick={confirmDelete} disabled={avatarUploading} className="text-xs px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50">
+                      <button onClick={() => setAvatarConfirm('idle')} className="btn-outline btn-sm rounded-full px-4 text-xs">Cancel</button>
+                      <button onClick={confirmDelete} disabled={avatarUploading} className="text-xs px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors disabled:opacity-50">
                         {avatarUploading ? <span className="spinner w-3 h-3 border-white border-t-transparent" /> : 'Remove'}
                       </button>
                     </div>
@@ -270,12 +269,12 @@ export default function Profile() {
                 {avatarConfirm === 'idle' && (
                   <div className="flex items-center gap-2">
                     <button type="button" onClick={() => avatarInputRef.current?.click()}
-                      className="btn-outline btn-sm text-xs flex items-center gap-1">
-                      <RiCameraLine /> {avatarSrc(user?.avatar) ? 'Change Photo' : 'Upload Photo'}
+                      className="btn-outline rounded-full px-4 py-2 text-sm font-medium flex items-center gap-1.5 hover:border-brand-accent hover:text-brand-accent">
+                      <RiCameraLine className="text-lg" /> {avatarSrc(user?.avatar) ? 'Change Photo' : 'Upload Photo'}
                     </button>
                     {avatarSrc(user?.avatar) && (
                       <button type="button" onClick={() => setAvatarConfirm('delete')}
-                        className="text-xs px-3 py-1.5 text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors">
+                        className="text-sm font-medium px-4 py-2 text-brand-danger border border-red-200 rounded-full hover:bg-red-50 transition-colors">
                         Remove Photo
                       </button>
                     )}
@@ -285,7 +284,7 @@ export default function Profile() {
 
               {/* ─ Personal info ─ */}
               <form onSubmit={saveProfile} className="space-y-4 pb-6 border-b border-gray-100 mb-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Personal Information</p>
+                <p className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-4">Personal Information</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div><label className="form-label">First Name</label>
                     <input className="form-input" value={form.first_name}
@@ -300,14 +299,14 @@ export default function Profile() {
                   <input className="form-input" placeholder="081x or +62 81x" value={form.phone}
                     onChange={e => setForm(f => ({...f, phone: e.target.value}))} />
                 </div>
-                <button type="submit" disabled={saving} className="btn-primary btn-sm disabled:opacity-50">
+                <button type="submit" disabled={saving} className="btn-primary rounded-full px-6 py-2 text-sm font-medium disabled:opacity-50">
                   {saving ? 'Saving…' : 'Save Changes'}
                 </button>
               </form>
 
               {/* ─ Password change ─ */}
               <form onSubmit={changePassword} className="space-y-4">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Change Password</p>
+                <p className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-4">Change Password</p>
                 <div><label className="form-label">Current Password</label>
                   <input type="password" className="form-input" value={pwForm.current_password}
                     onChange={e => setPwForm(f => ({...f, current_password: e.target.value}))} />
@@ -323,7 +322,7 @@ export default function Profile() {
                       onChange={e => setPwForm(f => ({...f, confirm: e.target.value}))} />
                   </div>
                 </div>
-                <button type="submit" disabled={pwSaving} className="btn-outline btn-sm disabled:opacity-50">
+                <button type="submit" disabled={pwSaving} className="btn-outline rounded-full px-6 py-2 text-sm font-medium disabled:opacity-50 hover:border-brand-accent hover:text-brand-accent">
                   {pwSaving ? 'Changing…' : 'Change Password'}
                 </button>
               </form>
@@ -332,17 +331,17 @@ export default function Profile() {
 
           {/* ── Activity feed ──────────────────────────────── */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-sm uppercase tracking-wider">Activity</h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+              <h2 className="font-black text-xl text-brand-secondary uppercase">Activity</h2>
               {/* Tab filter */}
-              <div className="flex border border-gray-200 rounded overflow-hidden text-xs">
+              <div className="flex bg-gray-50 p-1 rounded-full border border-gray-200 overflow-hidden text-sm">
                 {[
                   { id: 'all',      icon: <RiListCheck2  />, label: 'All'      },
                   { id: 'posts',    icon: <RiFileTextLine/>, label: 'Posts'    },
                   { id: 'comments', icon: <RiChat1Line   />, label: 'Comments' },
                 ].map(t => (
                   <button key={t.id} onClick={() => setTab(t.id)}
-                    className={`flex items-center gap-1 px-3 py-1.5 transition-colors ${tab === t.id ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
+                    className={`flex items-center gap-1.5 px-5 py-2 rounded-full font-medium transition-all duration-200 ${tab === t.id ? 'bg-white shadow text-brand-secondary' : 'text-gray-500 hover:text-brand-secondary'}`}>
                     {t.icon} {t.label}
                   </button>
                 ))}
@@ -350,11 +349,11 @@ export default function Profile() {
             </div>
 
             {actLoading ? (
-              <div className="flex justify-center py-12"><div className="spinner w-6 h-6"/></div>
+              <div className="flex justify-center py-12"><div className="spinner w-6 h-6 border-brand-accent border-t-transparent"/></div>
             ) : feedItems.length === 0 ? (
               <div className="text-center py-12 text-gray-400 text-sm">No activity yet.</div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {feedItems.map((item, idx) => (
                   item.type === 'post' ? (() => {
                     const removed = item.state === 'mod_removed';
@@ -366,14 +365,14 @@ export default function Profile() {
                           <p className={`text-xs mt-0.5 line-clamp-2 ${removed ? 'text-gray-300' : 'text-gray-400'}`}>{item.data.content}</p>
                           <p className="text-xs text-gray-300 mt-1">{new Date(item.date).toLocaleDateString()}</p>
                         </div>
-                        <span className={`badge text-xs flex-shrink-0 ${removed ? 'bg-red-50 text-red-400 border-red-200' : 'badge-outline'}`}>
+                        <span className={`badge text-xs flex-shrink-0 ${removed ? 'bg-red-50 text-red-400 border-red-200' : 'bg-brand-primary-light text-brand-secondary border-brand-primary-light'}`}>
                           {removed ? 'Removed by moderator' : 'Post'}
                         </span>
                       </>
                     );
                     return removed
-                      ? <div key={`p-${idx}`} className="card p-4 flex items-start gap-3 opacity-60 cursor-not-allowed">{inner}</div>
-                      : <Link key={`p-${idx}`} to={`/community/${item.data.id}`} className="card p-4 flex items-start gap-3 hover:shadow-card transition-shadow block">{inner}</Link>;
+                      ? <div key={`p-${idx}`} className="bg-white p-6 rounded-2xl border border-gray-100 flex items-start gap-4 opacity-60 cursor-not-allowed">{inner}</div>
+                      : <Link key={`p-${idx}`} to={`/community/${item.data.id}`} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4 hover:shadow-md hover:border-brand-accent transition-all block">{inner}</Link>;
                   })() : (() => {
                     // Comment: check both comment state and parent thread state
                     const thread = item.data.threads;
@@ -397,15 +396,15 @@ export default function Profile() {
                           commentRemoved ? 'bg-red-50 text-red-400 border-red-200'
                           : threadRemoved ? 'bg-gray-100 text-gray-400 border-gray-200'
                           : threadSelfDel ? 'bg-gray-100 text-gray-400 border-gray-200'
-                          : 'badge-outline'
+                          : 'bg-brand-primary-light text-brand-secondary border-brand-primary-light'
                         }`}>
                           {commentRemoved ? 'Removed by moderator' : threadRemoved ? 'Thread removed' : threadSelfDel ? 'Thread deleted' : 'Comment'}
                         </span>
                       </>
                     );
                     return isDisabled
-                      ? <div key={`c-${idx}`} className="card p-4 flex items-start gap-3 opacity-60 cursor-not-allowed">{inner}</div>
-                      : <Link key={`c-${idx}`} to={`/community/${thread?.id}`} className="card p-4 flex items-start gap-3 hover:shadow-card transition-shadow block">{inner}</Link>;
+                      ? <div key={`c-${idx}`} className="bg-white p-6 rounded-2xl border border-gray-100 flex items-start gap-4 opacity-60 cursor-not-allowed">{inner}</div>
+                      : <Link key={`c-${idx}`} to={`/community/${thread?.id}`} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4 hover:shadow-md hover:border-brand-accent transition-all block">{inner}</Link>;
                   })()
                 ))}
               </div>

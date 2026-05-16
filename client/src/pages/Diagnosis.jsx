@@ -53,56 +53,57 @@ export default function Diagnosis() {
             <Link to="/" className="hover:text-black">Home</Link> &rsaquo; <span>Analysis Results</span>
           </p>
 
-          <h1 className="heading-section mb-10">ANALYSIS RESULTS</h1>
+          <h1 className="text-3xl font-black text-brand-secondary mb-10 uppercase">Analysis Results</h1>
 
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Left — Image */}
-            <div>
-              <div className="border border-gray-200 bg-gray-50 aspect-square flex items-center justify-center overflow-hidden">
+            <div className="space-y-6">
+              <div className="bg-white border border-gray-100 rounded-3xl shadow-md aspect-square flex items-center justify-center overflow-hidden relative group">
                 {diagnosis.image_url
                   ? <img src={`${import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000'}${diagnosis.image_url}`}
                       alt="Analyzed plant" className="w-full h-full object-cover" />
                   : <div className="text-gray-300 text-center"><p className="text-4xl mb-2">🌿</p><p className="text-xs">No image available</p></div>
                 }
               </div>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-                <div className="border border-gray-200 p-3">
-                  <p className="text-gray-400 mb-1">CONFIDENCE</p>
-                  <p className="font-bold">{diagnosis.confidence?.toFixed(1)}%</p>
+              <div className="grid grid-cols-3 gap-4 text-xs">
+                <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm text-center">
+                  <p className="text-brand-accent font-bold uppercase tracking-widest mb-1.5 text-[10px]">Confidence</p>
+                  <p className="font-black text-brand-secondary text-lg">{diagnosis.confidence?.toFixed(1)}%</p>
                 </div>
-                <div className="border border-gray-200 p-3">
-                  <p className="text-gray-400 mb-1">STATUS</p>
-                  <span className={SEVERITY_BADGE[severity] || 'badge-outline'}>{severity}</span>
+                <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm text-center flex flex-col items-center justify-center">
+                  <p className="text-brand-accent font-bold uppercase tracking-widest mb-1.5 text-[10px]">Status</p>
+                  <span className={`badge ${severity === 'healthy' ? 'bg-brand-accent text-white border-brand-accent' : severity === 'mild' ? 'bg-amber-500 text-white border-amber-500' : 'bg-red-500 text-white border-red-500'} scale-90 origin-center`}>{severity}</span>
                 </div>
-                <div className="border border-gray-200 p-3">
-                  <p className="text-gray-400 mb-1">ANALYZED</p>
-                  <p className="font-medium">{new Date(diagnosis.created_at).toLocaleDateString()}</p>
+                <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm text-center">
+                  <p className="text-brand-accent font-bold uppercase tracking-widest mb-1.5 text-[10px]">Analyzed</p>
+                  <p className="font-bold text-brand-secondary">{new Date(diagnosis.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
             </div>
 
             {/* Right — Results */}
-            <div className="space-y-6 animate-slide-up">
+            <div className="space-y-8 animate-slide-up">
               {/* Confidence bar */}
-              <div>
-                <div className="flex items-end justify-between mb-2">
-                  <p className="text-xs text-gray-400 uppercase tracking-wider">Diagnostic Confidence</p>
-                  <p className="text-4xl font-black">{diagnosis.confidence?.toFixed(1)}%</p>
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <div className="flex items-end justify-between mb-4">
+                  <p className="text-xs text-brand-accent font-bold uppercase tracking-widest">Diagnostic Confidence</p>
+                  <p className="text-4xl font-black text-brand-secondary">{diagnosis.confidence?.toFixed(1)}%</p>
                 </div>
-                <div className="confidence-bar">
-                  <div className="confidence-fill" style={{ width: `${diagnosis.confidence}%` }} />
+                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-brand-accent rounded-full transition-all duration-1000" style={{ width: `${diagnosis.confidence}%` }} />
                 </div>
               </div>
 
               {/* Disease name */}
-              <div className="border-t border-gray-200 pt-6">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Identified Pathogen</p>
-                <h2 className="text-3xl font-black uppercase mb-1">{diagnosis.disease_name}</h2>
+              <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden z-0">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary-light rounded-bl-full opacity-50 -z-10"></div>
+                <p className="text-xs text-brand-accent font-bold uppercase tracking-widest mb-3">Identified Pathogen</p>
+                <h2 className="text-3xl sm:text-4xl font-black text-brand-secondary uppercase mb-2 leading-tight">{diagnosis.disease_name}</h2>
                 {diagnosis.scientific_name && (
-                  <p className="text-sm text-gray-500 italic">{diagnosis.scientific_name}</p>
+                  <p className="text-lg text-gray-500 italic font-medium">{diagnosis.scientific_name}</p>
                 )}
                 {!isHealthy && (
-                  <span className={`badge mt-2 ${SEVERITY_BADGE[severity]}`}>
+                  <span className={`badge mt-4 text-sm px-4 py-1.5 ${severity === 'healthy' ? 'bg-brand-accent text-white' : severity === 'mild' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-red-50 text-red-500 border-red-200'}`}>
                     {severity.charAt(0).toUpperCase() + severity.slice(1)} Severity
                   </span>
                 )}
@@ -110,40 +111,47 @@ export default function Diagnosis() {
 
               {/* Action grid */}
               {!isHealthy && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="border border-gray-200 p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <RiAlertLine className="text-amber-500" />
-                      <p className="text-xs font-bold uppercase tracking-wider">Immediate Action</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl shadow-sm relative overflow-hidden">
+                    <div className="flex items-center gap-2.5 mb-3 relative z-10">
+                      <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                        <RiAlertLine className="text-lg" />
+                      </div>
+                      <p className="text-xs font-black text-amber-800 uppercase tracking-widest">Immediate Action</p>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">{diagnosis.immediate_action}</p>
+                    <p className="text-sm text-amber-900/80 leading-relaxed relative z-10">{diagnosis.immediate_action}</p>
                   </div>
-                  <div className="border border-gray-200 p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <RiCalendarLine className="text-blue-500" />
-                      <p className="text-xs font-bold uppercase tracking-wider">Treatment Plan</p>
+                  <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl shadow-sm relative overflow-hidden">
+                    <div className="flex items-center gap-2.5 mb-3 relative z-10">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                        <RiCalendarLine className="text-lg" />
+                      </div>
+                      <p className="text-xs font-black text-blue-800 uppercase tracking-widest">Treatment Plan</p>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">{diagnosis.treatment_plan}</p>
+                    <p className="text-sm text-blue-900/80 leading-relaxed relative z-10">{diagnosis.treatment_plan}</p>
                   </div>
                 </div>
               )}
 
               {isHealthy && (
-                <div className="border border-green-200 bg-green-50 p-4 rounded">
-                  <p className="text-sm font-semibold text-green-700 mb-1">✓ Plant is Healthy</p>
-                  <p className="text-xs text-green-600">{diagnosis.immediate_action}</p>
+                <div className="bg-brand-primary-light border border-brand-accent p-6 rounded-3xl shadow-sm">
+                  <p className="text-lg font-black text-brand-secondary mb-2 flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-full bg-brand-accent text-white flex items-center justify-center text-sm">✓</span> Plant is Healthy
+                  </p>
+                  <p className="text-sm text-brand-secondary/80 font-medium">{diagnosis.immediate_action}</p>
                 </div>
               )}
 
               {/* Export banner */}
-              <div className="border border-gray-900 bg-gray-900 text-white p-4 flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-wider mb-1">Expert Consultation Required?</p>
-                  <p className="text-xs text-gray-400">Download Comprehensive PDF Report</p>
+              <div className="bg-brand-secondary border border-brand-secondary p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                <div className="absolute -right-6 -bottom-10 text-brand-primary-light/10 text-9xl">🌿</div>
+                <div className="relative z-10">
+                  <p className="text-xs font-bold uppercase tracking-widest text-brand-primary-light mb-1.5">Expert Consultation Required?</p>
+                  <p className="text-sm text-gray-300">Download Comprehensive PDF Report</p>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => toast.success('PDF export coming soon!')} className="btn btn-sm border-white text-white hover:bg-white hover:text-black gap-1.5">
-                    <RiDownload2Line /> EXPORT DATA
+                <div className="flex gap-2 flex-shrink-0 relative z-10">
+                  <button onClick={() => toast.success('PDF export coming soon!')} className="btn bg-white text-brand-secondary hover:bg-brand-primary-light hover:text-brand-secondary rounded-full px-6 py-2.5 flex items-center gap-2 text-sm font-bold transition-colors shadow-md">
+                    <RiDownload2Line className="text-lg" /> EXPORT DATA
                   </button>
                 </div>
               </div>

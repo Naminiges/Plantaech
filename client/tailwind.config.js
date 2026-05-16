@@ -6,23 +6,26 @@ export default {
   ],
   theme: {
     extend: {
-      // ── Design Tokens (modular — frontend team can customize here) ──
+      // ── Design Tokens (High-Fidelity) ──
       colors: {
         brand: {
-          black:  'var(--color-black)',
-          white:  'var(--color-white)',
-          gray:   'var(--color-gray)',
-          'gray-light': 'var(--color-gray-light)',
-          'gray-border': 'var(--color-gray-border)',
-          accent: 'var(--color-accent)',
-          'accent-hover': 'var(--color-accent-hover)',
-          danger: 'var(--color-danger)',
-          warning: 'var(--color-warning)',
-          success: 'var(--color-success)',
+          primary: '#FFFFFF',
+          'primary-light': '#F8F9FA',
+          secondary: '#1E4620',
+          'secondary-light': '#2D6A4F',
+          accent: '#4AD66D',
+          warning: '#FFB703',
+          black:  '#111111',
+          white:  '#FFFFFF',
+          gray:   '#666666',
+          'gray-light': '#F8F9FA',
+          'gray-border': '#E2E2E2',
+          danger: '#DC2626',
+          success: '#16A34A',
         },
       },
       fontFamily: {
-        sans:  ['Inter', 'system-ui', 'sans-serif'],
+        sans:  ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
         serif: ['Georgia', 'serif'],
         mono:  ['JetBrains Mono', 'monospace'],
       },
@@ -39,9 +42,9 @@ export default {
         slideDown: { '0%': { opacity: '0', transform: 'translateY(-10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
       },
       boxShadow: {
-        'card': '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
-        'card-hover': '0 4px 12px rgba(0,0,0,0.12)',
-        'modal': '0 20px 60px rgba(0,0,0,0.3)',
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'modal': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       },
     },
   },

@@ -61,11 +61,17 @@ export default function NewThread() {
       <Navbar />
       <main className="flex-1" style={{paddingTop:'var(--nav-height)'}}>
         <div className="page-container py-12 max-w-2xl">
-          <button onClick={() => navigate('/community')} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black mb-6 transition-colors">
+          <button onClick={() => navigate('/community')} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-accent mb-6 transition-colors font-medium">
             <RiArrowLeftLine /> Back to Community
           </button>
-          <h1 className="heading-section mb-8">NEW QUESTION</h1>
-          <form onSubmit={handleSubmit} id="new-thread-form" className="space-y-5">
+          
+          <div className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-gray-100">
+            <div className="mb-8 border-b border-gray-100 pb-6">
+              <h1 className="text-3xl font-black text-brand-secondary">ASK A QUESTION</h1>
+              <p className="text-gray-500 font-medium mt-2">Get help from the community by providing details about your plant issue.</p>
+            </div>
+            
+            <form onSubmit={handleSubmit} id="new-thread-form" className="space-y-6">
 
             {/* Title */}
             <div>
@@ -90,7 +96,7 @@ export default function NewThread() {
                 {PRESET_TAGS.map(tag => (
                   <button key={tag} type="button" id={`tag-${tag}`}
                     onClick={() => toggleTag(tag)}
-                    className={`badge cursor-pointer transition-colors ${form.tags.includes(tag) ? 'badge-black' : 'badge-outline hover:border-gray-400'}`}
+                    className={`badge cursor-pointer transition-all duration-200 ${form.tags.includes(tag) ? 'bg-brand-secondary text-white border-brand-secondary shadow-md' : 'badge-outline hover:border-brand-accent hover:text-brand-accent'}`}
                   >{tag}</button>
                 ))}
               </div>
@@ -108,33 +114,35 @@ export default function NewThread() {
             <div>
               <label className="form-label">Attach Image <span className="text-gray-400 font-normal">(optional, max 5 MB)</span></label>
               {preview ? (
-                <div className="relative mt-2 w-full border border-gray-200 rounded overflow-hidden">
-                  <img src={preview} alt="Preview" className="w-full max-h-64 object-cover" />
+                <div className="relative mt-2 w-full border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                  <img src={preview} alt="Preview" className="w-full max-h-[30rem] object-cover" />
                   <button type="button" onClick={removeImage}
-                    className="absolute top-2 right-2 bg-white border border-gray-200 rounded-full p-1 shadow hover:bg-red-50 hover:text-red-500 transition-colors">
-                    <RiCloseLine />
+                    className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full p-2 shadow-lg hover:bg-red-50 hover:text-red-500 transition-colors">
+                    <RiCloseLine className="text-xl" />
                   </button>
                 </div>
               ) : (
                 <button type="button" id="attach-image-btn"
                   onClick={() => fileRef.current?.click()}
-                  className="mt-2 w-full border-2 border-dashed border-gray-200 rounded py-8 flex flex-col items-center gap-2 text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-colors">
-                  <RiImageAddLine className="text-2xl" />
-                  <span className="text-sm">Click to attach an image</span>
+                  className="mt-2 w-full border-2 border-dashed border-gray-200 hover:border-brand-accent hover:bg-brand-primary-light rounded-2xl py-12 flex flex-col items-center gap-3 text-gray-400 hover:text-brand-secondary transition-all">
+                  <RiImageAddLine className="text-4xl" />
+                  <span className="text-sm font-medium">Click to browse or drag and drop an image</span>
+                  <span className="text-xs text-gray-400 font-normal">PNG, JPG, WEBP up to 5MB</span>
                 </button>
               )}
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
                 className="hidden" onChange={handleImageChange} id="thread-image-input" />
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <button type="button" onClick={() => navigate('/community')} className="btn-outline">Cancel</button>
+            <div className="flex gap-4 pt-6 mt-6 border-t border-gray-100">
+              <button type="button" onClick={() => navigate('/community')} className="btn-outline px-8 rounded-full">Cancel</button>
               <button type="submit" id="submit-thread-btn" disabled={loading}
-                className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
-                {loading && <span className="spinner w-4 h-4 border-white border-t-transparent"/>} Post Question
+                className="btn-primary rounded-full px-8 flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
+                {loading && <span className="spinner w-5 h-5 border-white border-t-transparent"/>} Post Question
               </button>
             </div>
           </form>
+          </div>
         </div>
       </main>
       <Footer />

@@ -81,26 +81,26 @@ export default function ThreadDetail() {
       <Navbar />
       <main className="flex-1" style={{paddingTop:'var(--nav-height)'}}>
         <div className="page-container py-12 max-w-3xl">
-          <Link to="/community" className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black mb-6 transition-colors">
+          <Link to="/community" className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-accent mb-6 transition-colors font-medium">
             <RiArrowLeftLine /> Back to Community
           </Link>
 
           {thread && (
-            <article className="card p-6 mb-8">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <h1 className="text-xl font-bold">{thread.title}</h1>
+            <article className="bg-white p-8 rounded-3xl shadow-md border border-gray-100 mb-8">
+              <div className="flex items-start justify-between gap-4 mb-6">
+                <h1 className="text-2xl md:text-3xl font-black text-brand-secondary leading-tight">{thread.title}</h1>
                 <div className="flex gap-1.5 flex-shrink-0">
-                  <button onClick={()=>setReportTarget({threadId:id})} className="btn-ghost btn-sm p-1.5 text-gray-400 hover:text-red-400">
-                    <RiFlag2Line/>
+                  <button onClick={()=>setReportTarget({threadId:id})} className="p-2 rounded-full text-gray-400 hover:text-brand-danger hover:bg-red-50 transition-colors">
+                    <RiFlag2Line className="text-xl" />
                   </button>
                   {(user?.id===thread.user_id || user?.role==='admin') && (
-                    <button onClick={deleteThread} className="btn-ghost btn-sm p-1.5 text-gray-400 hover:text-red-500">
-                      <RiDeleteBin6Line/>
+                    <button onClick={deleteThread} className="p-2 rounded-full text-gray-400 hover:text-brand-danger hover:bg-red-50 transition-colors">
+                      <RiDeleteBin6Line className="text-xl" />
                     </button>
                   )}
                 </div>
               </div>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed mb-4">{thread.content}</p>
+              <p className="text-base text-gray-600 whitespace-pre-wrap leading-relaxed mb-6">{thread.content}</p>
 
               {/* Attached image */}
               {thread.image_url && (() => {
@@ -113,41 +113,42 @@ export default function ThreadDetail() {
                 );
               })()}
 
-              <div className="flex items-center gap-2 text-xs text-gray-400 pt-4 border-t border-gray-100">
-                <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold">
+              <div className="flex items-center gap-3 pt-6 border-t border-gray-100">
+                <div className="w-10 h-10 rounded-full bg-brand-primary-light text-brand-secondary flex items-center justify-center text-sm font-bold">
                   {thread.users?.first_name?.[0]}
                 </div>
-                <span className="font-medium text-gray-600">{thread.users?.first_name} {thread.users?.last_name}</span>
-                <span>·</span>
-                <span>{new Date(thread.created_at).toLocaleString()}</span>
+                <div>
+                  <div className="font-bold text-brand-secondary">{thread.users?.first_name} {thread.users?.last_name}</div>
+                  <div className="text-xs text-gray-400 font-medium">{new Date(thread.created_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
               </div>
             </article>
           )}
 
           {/* Comments */}
-          <div className="space-y-3 mb-8">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{comments.length} Comment{comments.length!==1?'s':''}</p>
+          <div className="space-y-4 mb-8">
+            <p className="text-sm font-bold uppercase tracking-wider text-brand-accent">{comments.length} Comment{comments.length!==1?'s':''}</p>
             {comments.map(c => (
-              <div key={c.id} className="card p-4 flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold flex-shrink-0">
+              <div key={c.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex gap-4">
+                <div className="w-10 h-10 rounded-full bg-brand-primary-light text-brand-secondary flex items-center justify-center text-sm font-bold flex-shrink-0 mt-1">
                   {c.users?.first_name?.[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-sm font-medium">{c.users?.first_name} {c.users?.last_name}</span>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-base font-bold text-brand-secondary">{c.users?.first_name} {c.users?.last_name}</span>
                     <div className="flex gap-1">
-                      <button onClick={()=>setReportTarget({commentId:c.id})} className="text-gray-300 hover:text-red-400 transition-colors p-0.5">
-                        <RiFlag2Line className="text-xs"/>
+                      <button onClick={()=>setReportTarget({commentId:c.id})} className="text-gray-300 hover:text-brand-danger transition-colors p-1">
+                        <RiFlag2Line className="text-base"/>
                       </button>
                       {(user?.id===c.user_id || user?.role==='admin') && (
-                        <button onClick={()=>deleteComment(c.id)} className="text-gray-300 hover:text-red-500 transition-colors p-0.5">
-                          <RiDeleteBin6Line className="text-xs"/>
+                        <button onClick={()=>deleteComment(c.id)} className="text-gray-300 hover:text-brand-danger transition-colors p-1">
+                          <RiDeleteBin6Line className="text-base"/>
                         </button>
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{c.content}</p>
-                  <p className="text-xs text-gray-400 mt-1">{new Date(c.created_at).toLocaleString()}</p>
+                  <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">{c.content}</p>
+                  <p className="text-xs text-gray-400 mt-3 font-medium">{new Date(c.created_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
               </div>
             ))}
@@ -155,17 +156,17 @@ export default function ThreadDetail() {
 
           {/* Comment form */}
           {isAuthenticated ? (
-            <form onSubmit={submitComment} className="card p-4">
-              <label className="form-label mb-2 block">Add a comment</label>
+            <form onSubmit={submitComment} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+              <label className="form-label mb-3 block text-brand-secondary">Add a comment</label>
               <textarea
                 id="comment-input"
-                className="form-input resize-none mb-3" rows={3}
+                className="form-input resize-none mb-4 rounded-xl" rows={4}
                 placeholder="Share your knowledge or ask a follow-up..."
                 value={comment} onChange={e=>setComment(e.target.value)}
               />
               <div className="flex justify-end">
-                <button type="submit" id="submit-comment-btn" disabled={submitting||!comment.trim()} className="btn-primary btn-sm flex items-center gap-1.5 disabled:opacity-50">
-                  {submitting?<span className="spinner w-3 h-3 border-white border-t-transparent"/>:<RiSendPlaneLine/>} Post Comment
+                <button type="submit" id="submit-comment-btn" disabled={submitting||!comment.trim()} className="btn-primary rounded-full px-6 flex items-center gap-2 disabled:opacity-50">
+                  {submitting?<span className="spinner w-4 h-4 border-white border-t-transparent"/>:<RiSendPlaneLine className="text-lg"/>} Post Comment
                 </button>
               </div>
             </form>

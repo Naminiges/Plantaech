@@ -32,59 +32,71 @@ export default function Landing() {
       {/* Hero Section */}
       <main className="flex-1" style={{ paddingTop: 'var(--nav-height)' }}>
         <section className="page-container py-16 md:py-24">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-start">
             {/* Left — Text */}
-            <div className="animate-slide-up">
-              <h1 className="heading-hero mb-6 text-balance">
+            <div className="animate-slide-up pt-4">
+              <h1 className="heading-hero mb-6 text-balance text-brand-secondary">
                 DIAGNOSTIC<br />
                 PRECISION FOR<br />
                 AGRICULTURE.
               </h1>
-              <p className="text-gray-500 text-base max-w-md mb-8 leading-relaxed">
+              <p className="text-gray-600 text-lg max-w-md mb-10 leading-relaxed font-medium">
                 Identify plant diseases instantly using our high-contrast clinical analysis engine.
                 Upload a clear image of the affected leaf to begin.
               </p>
-              {/* Upload integrated in hero */}
-              <div className="max-w-xs">
-                <UploadArea />
-              </div>
+              {/* Call to action button that scrolls to upload */}
+              <a href="#upload-section" className="btn-primary btn-lg rounded-full inline-flex">
+                START DIAGNOSIS
+              </a>
             </div>
 
             {/* Right — Visual Analysis Area (desktop only) */}
-            <div className="hidden md:block animate-fade-in">
-              <div className="border-2 border-black relative" style={{ aspectRatio: '1', maxWidth: 420 }}>
-                {/* Corner decorations */}
-                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-black -mt-px -ml-px" />
-                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-black -mt-px -mr-px" />
-                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-black -mb-px -ml-px" />
-                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-black -mb-px -mr-px" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                  <div className="border-2 border-dashed border-gray-300 p-6 rounded">
-                    <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">VISUAL ANALYSIS AREA</p>
-                  <p className="text-xs text-gray-300">Upload an image to begin analysis</p>
+            <div className="hidden md:block animate-fade-in relative">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform hover:scale-[1.02] transition-transform duration-500">
+                <img src="/images/ai-scan.png" alt="AI scanning leaf" className="w-full h-auto object-cover aspect-square" />
+                {/* Decorative glowing overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-brand-secondary/30 to-transparent mix-blend-overlay"></div>
+                {/* Floating badge */}
+                <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-xl shadow-lg flex items-center gap-3">
+                   <div className="w-3 h-3 rounded-full bg-brand-accent animate-pulse"></div>
+                   <span className="text-sm font-bold text-brand-secondary tracking-wider">SYSTEM READY</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
+        
+        {/* Upload Section */}
+        <section id="upload-section" className="py-20 bg-brand-primary-light">
+          <div className="page-container max-w-3xl">
+            <div className="text-center mb-10">
+              <h2 className="heading-section text-brand-secondary mb-4">ANALYZE YOUR PLANT</h2>
+              <p className="text-gray-600 font-medium">Upload a clear photo of the symptomatic leaf. Our AI will handle the rest.</p>
+            </div>
+            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+              <UploadArea />
+            </div>
+          </div>
+        </section>
 
         {/* Protocol Section */}
-        <section className="border-t border-gray-200 py-16">
+        <section className="bg-white border-t border-gray-100 py-24">
           <div className="page-container">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-8">THE PROTOCOL</p>
+            <div className="text-center mb-16">
+              <p className="text-sm font-bold uppercase tracking-widest text-brand-accent mb-3">THE PROTOCOL</p>
+              <h2 className="heading-section text-brand-secondary">HOW IT WORKS</h2>
+            </div>
             <div className="grid md:grid-cols-3 gap-8">
               {PROTOCOLS.map(({ num, title, icon: Icon, desc }) => (
-                <div key={num} className="animate-fade-in">
-                  <div className="step-number mb-4">{num}</div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Icon className="text-base" />
-                    <h3 className="font-bold text-sm uppercase tracking-wider">{title}</h3>
+                <div key={num} className="card-hover p-8 flex flex-col items-start bg-brand-primary-light/50">
+                  <div className="w-14 h-14 rounded-2xl bg-brand-accent/20 flex items-center justify-center mb-6 shadow-sm border border-brand-accent/10">
+                    <span className="font-black text-xl text-brand-secondary">{num}</span>
                   </div>
-                  <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
+                  <div className="flex items-center gap-3 mb-4">
+                    <Icon className="text-2xl text-brand-accent" />
+                    <h3 className="font-bold text-lg text-brand-secondary tracking-wide">{title}</h3>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
