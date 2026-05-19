@@ -51,7 +51,7 @@ export default function Register() {
       <div className="max-w-5xl w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
         {/* Brand Side */}
         <div className="text-center lg:text-left flex-1 animate-slide-up hidden lg:block">
-          <img src={logo} alt="Plantaech Logo" className="h-20 lg:h-28 mx-auto lg:mx-0 object-contain mb-6 lg:-ml-4 drop-shadow-sm" />
+          <img src={logo} alt="Plantaech Logo" className="h-28 lg:h-40 mx-auto lg:mx-0 object-contain mb-6 lg:-ml-4 drop-shadow-sm" />
           <h2 className="text-2xl lg:text-3xl text-gray-700 font-medium leading-snug max-w-md mx-auto lg:mx-0">
             Join the Revolution. Access advanced plant diagnostics and a thriving community.
           </h2>
@@ -61,7 +61,7 @@ export default function Register() {
         <div className="w-full max-w-[480px] animate-slide-up" style={{ animationDelay: '0.1s' }}>
           {/* Show logo on mobile above the form */}
           <div className="lg:hidden text-center mb-6">
-            <img src={logo} alt="Plantaech Logo" className="h-16 mx-auto object-contain drop-shadow-sm" />
+            <img src={logo} alt="Plantaech Logo" className="h-24 mx-auto object-contain drop-shadow-sm" />
           </div>
 
           <div className="bg-white p-8 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100">

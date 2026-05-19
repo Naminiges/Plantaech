@@ -44,7 +44,7 @@ export default function Login() {
       <div className="max-w-5xl w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
         {/* Brand Side */}
         <div className="text-center lg:text-left flex-1 animate-slide-up">
-          <img src={logo} alt="Plantaech Logo" className="h-20 lg:h-28 mx-auto lg:mx-0 object-contain mb-6 lg:-ml-4 drop-shadow-sm" />
+          <img src={logo} alt="Plantaech Logo" className="h-28 lg:h-40 mx-auto lg:mx-0 object-contain mb-6 lg:-ml-4 drop-shadow-sm" />
           <h2 className="text-2xl lg:text-3xl text-gray-700 font-medium leading-snug max-w-md mx-auto lg:mx-0">
             Diagnostic Precision for Agriculture. Empowering farmers with AI-driven insights.
           </h2>

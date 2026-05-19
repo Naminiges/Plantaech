@@ -20,8 +20,8 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-secondary border-b border-white/10 shadow-sm" style={{ height: 'var(--nav-height)' }}>
       <div className="page-container h-full flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 font-black text-xl tracking-tight text-white">
-          <img src={logo} alt="Plantaech Logo" className="h-8 object-contain" />
+        <Link to="/" className="flex items-center gap-3 font-black text-2xl tracking-tight text-white">
+          <img src={logo} alt="Plantaech Logo" className="h-12 object-contain" />
           PLANTAECH
         </Link>
 
