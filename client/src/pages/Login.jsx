@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { RiPlantLine, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import toast from 'react-hot-toast';
+import logo from '../assets/logo.png';
 
 export default function Login() {
   const { login } = useAuth();
@@ -39,38 +40,37 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex bg-brand-primary-light relative">
-      {/* Minimal header */}
-      <div className="absolute top-0 left-0 z-10 py-6 px-8">
-        <Link to="/" className="flex items-center gap-2 font-black text-xl tracking-tight w-fit text-brand-secondary">
-          <RiPlantLine className="text-brand-accent text-3xl" /> PLANTAECH
-        </Link>
-      </div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="max-w-5xl w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+        {/* Brand Side */}
+        <div className="text-center lg:text-left flex-1 animate-slide-up">
+          <img src={logo} alt="Plantaech Logo" className="h-20 lg:h-28 mx-auto lg:mx-0 object-contain mb-6 lg:-ml-4 drop-shadow-sm" />
+          <h2 className="text-2xl lg:text-3xl text-gray-700 font-medium leading-snug max-w-md mx-auto lg:mx-0">
+            Diagnostic Precision for Agriculture. Empowering farmers with AI-driven insights.
+          </h2>
+        </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row w-full">
-        {/* Form side */}
-        <div className="flex-1 flex items-center justify-center p-8 relative z-10">
-          <div className="w-full max-w-sm animate-slide-up bg-white p-10 rounded-3xl shadow-xl border border-gray-100">
-            <h1 className="text-3xl font-black mb-2 text-brand-secondary">Welcome Back</h1>
-            <p className="text-sm text-gray-500 mb-8 font-medium">Please enter your details to sign in.</p>
+        {/* Form Side */}
+        <div className="w-full max-w-[420px] animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="bg-white p-8 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100">
+            <h1 className="text-2xl font-black mb-1 text-brand-secondary">Log In</h1>
+            <p className="text-sm text-gray-500 mb-6 font-medium">Enter your details to access your account.</p>
 
             <form onSubmit={handleSubmit} className="space-y-4" id="login-form">
               <div>
-                <label className="form-label">Email</label>
                 <input
                   id="login-email"
-                  type="email" className="form-input" placeholder="name@example.com"
+                  type="email" className="form-input text-base py-3" placeholder="Email address"
                   value={form.email} onChange={e => { setForm({...form, email: e.target.value}); setErrors({...errors, email: ''}); }}
                 />
                 {errors.email && <p className="form-error">{errors.email}</p>}
               </div>
 
               <div>
-                <label className="form-label">Password</label>
                 <div className="relative">
                   <input
                     id="login-password"
-                    type={showPw ? 'text' : 'password'} className="form-input pr-10" placeholder="Your password"
+                    type={showPw ? 'text' : 'password'} className="form-input text-base py-3 pr-10" placeholder="Password"
                     value={form.password} onChange={e => { setForm({...form, password: e.target.value}); setErrors({...errors, password: ''}); }}
                   />
                   <button type="button" tabIndex={-1} onClick={() => setShowPw(!showPw)}
@@ -81,30 +81,27 @@ export default function Login() {
                 {errors.password && <p className="form-error">{errors.password}</p>}
               </div>
 
-              <p className="text-sm text-gray-500 text-center font-medium">
-                Don't have an account?{' '}
-                <Link to="/register" className="font-bold text-brand-secondary hover:text-brand-accent transition-colors">Sign Up</Link>
-              </p>
-
-              <div className="flex gap-3 pt-2">
-                <button type="button" id="reset-password-btn" className="btn-outline btn-sm">Reset password</button>
-                <button type="submit" id="login-submit-btn" disabled={loading} className="btn-primary btn-sm flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
-                  {loading ? <span className="spinner w-3 h-3 border-white border-t-transparent" /> : null}
-                  Sign in
+              <div className="pt-2">
+                <button type="submit" id="login-submit-btn" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 text-base py-3 font-bold rounded-lg bg-brand-secondary hover:bg-brand-secondary/90">
+                  {loading ? <span className="spinner w-5 h-5 border-white border-t-transparent" /> : null}
+                  Log In
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
 
-        {/* Decorative side */}
-        <div className="hidden lg:block lg:w-1/2 relative">
-          <img src="/images/auth-bg.png" alt="Modern Greenhouse" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-brand-secondary/20 mix-blend-multiply"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-secondary/80 via-transparent to-transparent"></div>
-          <div className="absolute bottom-12 left-12 right-12">
-            <h2 className="text-white text-3xl font-bold mb-3 drop-shadow-md">Diagnostic Precision<br/>for Agriculture.</h2>
-            <p className="text-white/90 text-lg max-w-md drop-shadow">Empowering farmers with AI-driven insights and instant disease detection.</p>
+              <div className="text-center pt-2">
+                <button type="button" id="reset-password-btn" className="text-sm font-medium text-brand-secondary hover:underline">Forgotten password?</button>
+              </div>
+
+              <div className="flex items-center py-4">
+                <div className="flex-grow border-t border-gray-200"></div>
+              </div>
+
+              <div className="text-center">
+                <Link to="/register" className="inline-block bg-[#42b72a] hover:bg-[#36a420] text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                  Create new account
+                </Link>
+              </div>
+            </form>
           </div>
         </div>
       </div>
