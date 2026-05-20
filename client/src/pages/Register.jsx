@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { RiPlantLine, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import toast from 'react-hot-toast';
+import logo from '../assets/logo.png';
 
 export default function Register() {
   const { register } = useAuth();
@@ -46,67 +47,71 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex bg-brand-primary-light relative">
-      <div className="absolute top-0 right-0 z-10 py-6 px-8 lg:left-1/2 lg:right-auto">
-        <Link to="/" className="flex items-center gap-2 font-black text-xl tracking-tight w-fit text-brand-secondary">
-          <RiPlantLine className="text-brand-accent text-3xl" /> PLANTAECH
-        </Link>
-      </div>
-      <div className="flex-1 flex flex-col lg:flex-row w-full">
-        <div className="hidden lg:block lg:w-1/2 relative">
-          <img src="/images/auth-bg.png" alt="Modern Greenhouse" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-brand-secondary/30 mix-blend-multiply"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-secondary/90 via-transparent to-transparent"></div>
-          <div className="absolute bottom-12 left-12 right-12">
-            <h2 className="text-white text-3xl font-bold mb-3 drop-shadow-md">Join the Revolution.</h2>
-            <p className="text-white/90 text-lg max-w-md drop-shadow">Create an account to access advanced plant diagnostics and a thriving community.</p>
-          </div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="max-w-5xl w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+        {/* Brand Side */}
+        <div className="text-center flex-1 animate-slide-up hidden lg:block">
+          <img src={logo} alt="Plantaech Logo" className="h-40 lg:h-56 mx-auto object-contain mb-8 drop-shadow-sm" />
+          <h2 className="text-2xl lg:text-3xl text-gray-700 font-medium leading-snug max-w-md mx-auto">
+            Join the Revolution. Access advanced plant diagnostics and a thriving community.
+          </h2>
         </div>
-        <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto relative z-10">
-          <div className="w-full max-w-lg animate-slide-up bg-white p-10 rounded-3xl shadow-xl border border-gray-100 mt-10 lg:mt-0">
-            <h1 className="text-3xl font-black mb-2 text-brand-secondary">Sign up</h1>
-            <p className="text-sm text-gray-500 mb-8 font-medium">Please enter your details. We'll never share your email.</p>
+
+        {/* Form Side */}
+        <div className="w-full max-w-[480px] animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          {/* Show logo on mobile above the form */}
+          <div className="lg:hidden text-center mb-8">
+            <img src={logo} alt="Plantaech Logo" className="h-32 mx-auto object-contain drop-shadow-sm" />
+          </div>
+
+          <div className="bg-white p-8 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100">
+            <h1 className="text-2xl font-black mb-1 text-brand-secondary">Sign Up</h1>
+            <p className="text-sm text-gray-500 mb-6 font-medium">It's quick and easy.</p>
+
             <form onSubmit={handleSubmit} id="register-form" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 {[['reg-first','First name','first_name'],['reg-last','Last name','last_name']].map(([id,lbl,k])=>(
-                  <div key={k}><label className="form-label">{lbl}</label>
-                    <input id={id} type="text" className="form-input" value={form[k]} onChange={e=>set(k,e.target.value)} />
-                    {errors[k] && <p className="form-error">{errors[k]}</p>}
+                  <div key={k}>
+                    <input id={id} type="text" className="form-input" placeholder={lbl} value={form[k]} onChange={e=>set(k,e.target.value)} />
+                    {errors[k] && <p className="form-error mt-1">{errors[k]}</p>}
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="form-label">Email address</label>
-                  <input id="reg-email" type="email" className="form-input" placeholder="name@example.com" value={form.email} onChange={e=>set('email',e.target.value)} />
-                  {errors.email && <p className="form-error">{errors.email}</p>}
-                </div>
-                <div><label className="form-label">Phone number <span className="text-gray-400 font-normal">(optional)</span></label>
-                  <input id="reg-phone" type="tel" className="form-input" placeholder="081x or +62 81x" value={form.phone} onChange={e=>set('phone',e.target.value)} />
-                  {errors.phone && <p className="form-error">{errors.phone}</p>}
-                </div>
+              <div>
+                <input id="reg-email" type="email" className="form-input" placeholder="Email address" value={form.email} onChange={e=>set('email',e.target.value)} />
+                {errors.email && <p className="form-error mt-1">{errors.email}</p>}
+              </div>
+              <div>
+                <input id="reg-phone" type="tel" className="form-input" placeholder="Phone number (optional)" value={form.phone} onChange={e=>set('phone',e.target.value)} />
+                {errors.phone && <p className="form-error mt-1">{errors.phone}</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="form-label">Password</label>
+                <div>
                   <div className="relative">
-                    <input id="reg-password" type={showPw?'text':'password'} className="form-input pr-10" placeholder="Create password" value={form.password} onChange={e=>set('password',e.target.value)} />
+                    <input id="reg-password" type={showPw?'text':'password'} className="form-input pr-10" placeholder="New password" value={form.password} onChange={e=>set('password',e.target.value)} />
                     <button type="button" tabIndex={-1} onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                       {showPw?<RiEyeOffLine/>:<RiEyeLine/>}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">Min 8 chars, 1 uppercase, 1 number</p>
-                  {errors.password && <p className="form-error">{errors.password}</p>}
+                  {errors.password && <p className="form-error mt-1">{errors.password}</p>}
                 </div>
-                <div><label className="form-label">Confirm password</label>
+                <div>
                   <input id="reg-confirm" type={showPw?'text':'password'} className="form-input" placeholder="Repeat password" value={form.confirm} onChange={e=>set('confirm',e.target.value)} />
-                  {errors.confirm && <p className="form-error">{errors.confirm}</p>}
+                  {errors.confirm && <p className="form-error mt-1">{errors.confirm}</p>}
                 </div>
               </div>
-              <p className="text-sm text-gray-500 font-medium">Already have an account? <Link to="/login" className="font-bold text-brand-secondary hover:text-brand-accent transition-colors">Click Login</Link></p>
-              <div className="flex gap-3 pt-4">
-                <button type="button" id="cancel-register-btn" onClick={()=>navigate(-1)} className="btn-outline">Cancel</button>
-                <button type="submit" id="create-account-btn" disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
-                  {loading && <span className="spinner w-4 h-4 border-white border-t-transparent"/>} Create account
+              <p className="text-[11px] text-gray-500 mt-2 mb-4 leading-relaxed">
+                By clicking Sign Up, you agree to our Terms, Privacy Policy and Cookies Policy.
+              </p>
+              
+              <div className="pt-2 text-center">
+                <button type="submit" id="create-account-btn" disabled={loading} className="inline-block bg-[#42b72a] hover:bg-[#36a420] text-white font-bold text-lg py-2.5 px-12 rounded-lg transition-colors disabled:opacity-50 min-w-[200px] w-full lg:w-auto flex mx-auto items-center justify-center gap-2">
+                  {loading && <span className="spinner w-5 h-5 border-white border-t-transparent"/>} Sign Up
                 </button>
+              </div>
+
+              <div className="text-center mt-6">
+                <Link to="/login" className="text-brand-secondary font-medium hover:underline text-sm">Already have an account?</Link>
               </div>
             </form>
           </div>

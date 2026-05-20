@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { RiPlantLine, RiMenuLine, RiCloseLine, RiUserLine, RiLogoutBoxLine, RiShieldLine } from 'react-icons/ri';
+import logo from '../../assets/logo.png';
 
 export default function Navbar() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
@@ -19,8 +20,8 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-secondary border-b border-white/10 shadow-sm" style={{ height: 'var(--nav-height)' }}>
       <div className="page-container h-full flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 font-black text-xl tracking-tight text-white">
-          <RiPlantLine className="text-brand-accent text-3xl" />
+        <Link to="/" className="flex items-center gap-3 font-black text-2xl tracking-tight text-white">
+          <img src={logo} alt="Plantaech Logo" className="h-12 object-contain" />
           PLANTAECH
         </Link>
 
