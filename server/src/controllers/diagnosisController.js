@@ -1,14 +1,16 @@
 const supabase = require('../config/supabase');
 const aiService = require('../services/aiService');
-const path = require('path');
+const storage = require('../services/storage');
 
 // POST /api/diagnoses/upload
 const uploadDiagnosis = async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Image file is required' });
 
-    const imageUrl = `/uploads/${req.file.filename}`;
-    const result = await aiService.analyzeImage(req.file.path);
+    const result = await aiService.analyzeImage(req.file);
+
+    const objectKey = storage.buildObjectKey('diagnoses', req.file.originalname);
+    const imageUrl = await storage.uploadDiagnosisImage(req.file, objectKey);
 
     const diagnosisData = {
       image_url: imageUrl,
@@ -50,7 +52,20 @@ const getHistory = async (req, res, next) => {
       .range(from, to);
 
     if (error) throw error;
-    res.json({ diagnoses: data, total: count, page: parseInt(page), limit: parseInt(limit) });
+
+    const diagnoses = await Promise.all((data || []).map(async (d) => {
+      if (d.image_url && d.image_url.startsWith('supabase-private://')) {
+        try {
+          const signedUrl = await storage.createSignedUrlFromStoragePath(d.image_url, 60 * 60);
+          return { ...d, image_signed_url: signedUrl };
+        } catch (e) {
+          return d;
+        }
+      }
+      return d;
+    }));
+
+    res.json({ diagnoses, total: count, page: parseInt(page), limit: parseInt(limit) });
   } catch (err) {
     next(err);
   }
@@ -72,7 +87,17 @@ const getDiagnosis = async (req, res, next) => {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    res.json({ diagnosis: data });
+    let diagnosis = data;
+    if (data.image_url && data.image_url.startsWith('supabase-private://')) {
+      try {
+        const signedUrl = await storage.createSignedUrlFromStoragePath(data.image_url, 60 * 60);
+        diagnosis = { ...data, image_signed_url: signedUrl };
+      } catch (e) {
+        // ignore signed url errors
+      }
+    }
+
+    res.json({ diagnosis });
   } catch (err) {
     next(err);
   }

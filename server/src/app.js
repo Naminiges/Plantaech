@@ -4,7 +4,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
-const fs = require('fs');
 
 const authRoutes = require('./routes/auth');
 const diagnosisRoutes = require('./routes/diagnoses');
@@ -36,11 +35,6 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// ── Static uploads ─────────────────────────────────────────────────
-const uploadDir = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-app.use('/uploads', express.static(uploadDir));
 
 // ── API Routes ─────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);

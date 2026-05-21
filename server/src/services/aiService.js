@@ -101,16 +101,20 @@ const DISEASES = [
  * Analyze an image and return disease diagnosis.
  * Currently returns mock data. Replace with real API call when model is ready.
  *
- * @param {string} imagePath - Path to the uploaded image file
+ * @param {object} file - Multer file object (buffer or path)
  * @returns {Promise<Object>} Diagnosis result
  */
-const analyzeImage = async (imagePath) => {
+const analyzeImage = async (file) => {
   // TODO: When real model is ready, replace with:
   // const axios = require('axios');
   // const FormData = require('form-data');
   // const fs = require('fs');
   // const form = new FormData();
-  // form.append('file', fs.createReadStream(imagePath));
+  // if (file?.buffer) {
+  //   form.append('file', file.buffer, { filename: file.originalname, contentType: file.mimetype });
+  // } else {
+  //   form.append('file', fs.createReadStream(file.path));
+  // }
   // const response = await axios.post(process.env.AI_MODEL_API_URL, form, { headers: form.getHeaders() });
   // return response.data;
 
@@ -131,13 +135,15 @@ const analyzeImage = async (imagePath) => {
     ? 90 + Math.random() * 9
     : 75 + Math.random() * 22;
 
+  const imageName = file?.originalname || (file?.path ? path.basename(file.path) : 'upload');
+
   return {
     ...disease,
     confidence: parseFloat(confidence.toFixed(1)),
     metadata: {
       model_version: 'mock-v1.0',
       analyzed_at: new Date().toISOString(),
-      image_path: path.basename(imagePath),
+      image_path: imageName,
     },
   };
 };

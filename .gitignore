@@ -10,8 +10,6 @@ client/.env
 dist/
 client/dist/
 
-# Uploads (runtime generated)
-server/uploads/
 
 # Logs
 *.log

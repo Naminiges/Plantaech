@@ -98,7 +98,6 @@ Plantaech/
 │   │   ├── services/
 │   │   │   └── aiService.js            # Integrasi endpoint model AI
 │   │   └── app.js                      # Entry point Express
-│   ├── uploads/                        # Gambar yang diupload pengguna
 │   ├── .env
 │   ├── .env.example
 │   ├── railway.toml
@@ -234,6 +233,8 @@ CLIENT_URL=http://localhost:5173
 # Supabase — Settings > API di dashboard Supabase
 SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-secret-key
+SUPABASE_PUBLIC_BUCKET=public-images
+SUPABASE_DIAGNOSIS_BUCKET=diagnosis-images
 
 # JWT — buat string acak yang panjang
 JWT_SECRET=string_rahasia_panjang_anda
@@ -242,6 +243,10 @@ JWT_EXPIRES_IN=7d
 # AI Model
 AI_SERVICE_URL=http://localhost:8000
 ```
+
+**Supabase Storage buckets**
+- `SUPABASE_PUBLIC_BUCKET` dipakai untuk avatar dan gambar thread (public bucket).
+- `SUPABASE_DIAGNOSIS_BUCKET` dipakai untuk gambar diagnosis. Jika ingin private, set bucket ini sebagai private di Supabase. Jika ingin public, gunakan bucket public yang sama.
 
 #### c. Setup database
 

@@ -42,6 +42,11 @@ export default function Diagnosis() {
 
   const severity = diagnosis.severity || 'mild';
   const isHealthy = severity === 'healthy';
+  const API_BASE = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000';
+  const imageSrc = diagnosis.image_signed_url
+    || (diagnosis.image_url
+      ? (diagnosis.image_url.startsWith('http') ? diagnosis.image_url : `${API_BASE}${diagnosis.image_url}`)
+      : null);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -59,8 +64,8 @@ export default function Diagnosis() {
             {/* Left — Image */}
             <div className="space-y-6">
               <div className="bg-white border border-gray-100 rounded-3xl shadow-md aspect-square flex items-center justify-center overflow-hidden relative group">
-                {diagnosis.image_url
-                  ? <img src={`${import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000'}${diagnosis.image_url}`}
+                {imageSrc
+                  ? <img src={imageSrc}
                       alt="Analyzed plant" className="w-full h-full object-cover" />
                   : <div className="text-gray-300 text-center"><p className="text-4xl mb-2">🌿</p><p className="text-xs">No image available</p></div>
                 }

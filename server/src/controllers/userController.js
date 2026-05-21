@@ -1,5 +1,5 @@
 const supabase = require('../config/supabase');
-const path = require('path');
+const storage = require('../services/storage');
 
 const PHONE_REGEX = /^(\+62|62|0)8[1-9][0-9]{6,10}$/;
 const normalizePhone = (p) => p ? p.replace(/[\s\-]/g, '') : null;
@@ -37,7 +37,8 @@ const updateProfile = async (req, res, next) => {
 const updateAvatar = async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Avatar image is required' });
-    const avatarUrl = `/uploads/${req.file.filename}`;
+    const objectKey = storage.buildObjectKey('avatars', req.file.originalname);
+    const avatarUrl = await storage.uploadPublicImage(req.file, objectKey);
     const { data, error } = await supabase
       .from('users').update({ avatar: avatarUrl }).eq('id', req.user.id).select('id, avatar').single();
     if (error) throw error;
