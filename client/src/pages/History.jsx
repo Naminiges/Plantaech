@@ -50,10 +50,16 @@ export default function History() {
                 {data.map(d => (
                   <Link key={d.id} to={`/diagnosis/${d.id}`} state={{diagnosis: d}} className="card-hover overflow-hidden block flex flex-col h-full bg-white">
                     <div className="aspect-video bg-gray-100 overflow-hidden relative">
-                      {d.image_url
-                        ? <img src={`${API_BASE}${d.image_url}`} alt={d.disease_name} className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl bg-brand-primary-light">🌿</div>
-                      }
+                      {(() => {
+                        const imageSrc = d.image_signed_url
+                          || (d.image_url
+                            ? (d.image_url.startsWith('http') ? d.image_url : `${API_BASE}${d.image_url}`)
+                            : null);
+                        return imageSrc
+                          ? <img src={imageSrc} alt={d.disease_name} className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl bg-brand-primary-light">🌿</div>;
+                      })()}
+                      
                       <div className="absolute top-3 right-3">
                         <span className={`badge shadow-sm ${SEV[d.severity] || 'badge-outline'}`}>{d.severity}</span>
                       </div>
