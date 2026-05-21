@@ -31,7 +31,19 @@ const uploadDiagnosis = async (req, res, next) => {
       .single();
 
     if (error) throw error;
-    res.status(201).json({ diagnosis });
+
+    // Create signed URL for immediate display
+    let response = diagnosis;
+    if (diagnosis.image_url && diagnosis.image_url.startsWith('supabase-private://')) {
+      try {
+        const signedUrl = await storage.createSignedUrlFromStoragePath(diagnosis.image_url, 60 * 60);
+        response = { ...diagnosis, image_signed_url: signedUrl };
+      } catch (e) {
+        // ignore signed url errors, return diagnosis as-is
+      }
+    }
+
+    res.status(201).json({ diagnosis: response });
   } catch (err) {
     next(err);
   }
