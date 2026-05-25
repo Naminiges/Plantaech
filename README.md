@@ -67,6 +67,8 @@ Plantaech/
 │   │   ├── services/
 │   │   │   ├── api.js                  # Fetch wrapper (base URL, token, error)
 │   │   │   └── index.js                # Semua service (auth, user, forum, dll)
+│   │   ├── utils/
+│   │   │   └── exportPdf.js            # Ekspor laporan diagnosis ke PDF
 │   │   ├── App.jsx                     # Routing utama
 │   │   └── index.css                   # Design system & kelas komponen global
 │   ├── .env                            # VITE_API_URL
@@ -241,7 +243,7 @@ JWT_SECRET=string_rahasia_panjang_anda
 JWT_EXPIRES_IN=7d
 
 # AI Model
-AI_SERVICE_URL=http://localhost:8000
+AI_MODEL_API_URL=https://plantaech-ai-model-production.up.railway.app/predict
 ```
 
 **Supabase Storage buckets**
@@ -337,6 +339,7 @@ Aplikasi berjalan di `http://localhost:5173`.
 | POST | `/api/diagnoses/upload` | Opsional | Upload gambar & analisa AI |
 | GET | `/api/diagnoses/history` | Ya | Riwayat diagnosa |
 | GET | `/api/diagnoses/:id` | Ya | Detail satu diagnosa |
+| DELETE | `/api/diagnoses/:id` | Ya | Hapus diagnosa dari riwayat |
 
 #### Forum
 
@@ -377,19 +380,23 @@ Aplikasi berjalan di `http://localhost:5173`.
 
 ### 4. Menghubungkan Model AI
 
-Backend saat ini menggunakan mock AI service (`server/src/services/aiService.js`).
-Saat model sudah siap, ganti fungsi `analyzeImage` dengan HTTP call ke endpoint FastAPI:
+Backend saat ini sudah terintegrasi penuh dengan model AI FastAPI yang di-deploy terpisah.
+Fungsi `analyzeImage` pada `server/src/services/aiService.js` menangani pengiriman gambar menggunakan objek `Blob` dan *native* `fetch` API Node.js.
 
 ```js
-const form = new FormData();
-form.append('file', fs.createReadStream(imagePath));
-const response = await axios.post(process.env.AI_SERVICE_URL + '/predict', form, {
-  headers: form.getHeaders(),
+const fileBuffer = fs.readFileSync(imagePath);
+const blob = new Blob([fileBuffer], { type: 'image/jpeg' });
+const formData = new FormData();
+formData.append('file', blob, 'image.jpg');
+
+const response = await fetch(process.env.AI_MODEL_API_URL, {
+  method: 'POST',
+  body: formData
 });
-return response.data;
+const data = await response.json();
 ```
 
-Atur `AI_SERVICE_URL` di `.env` ke URL endpoint model yang sudah di-deploy.
+Pastikan `AI_MODEL_API_URL` di `.env` backend diatur mengarah ke URL public API model AI Anda (misalnya di Railway).
 
 ---
 
