@@ -8,19 +8,19 @@ const PROTOCOLS = [
     num: '01',
     title: 'CAPTURE EVIDENCE',
     icon: RiCameraLine,
-    desc: 'Take a high-resolution photograph of the symptomatic area. Ensure good lighting and focus on the affected leaf for maximum diagnostic accuracy.',
+    desc: 'Take a clear photograph of the affected tomato leaf. Ensure good lighting and focus on the symptomatic area for maximum diagnostic accuracy.',
   },
   {
     num: '02',
     title: 'CLINICAL PROCESSING',
     icon: RiCpuLine,
-    desc: 'Our model compares your specimen against a global database of known agricultural pathogens and stressors.',
+    desc: 'Our AI model analyzes your tomato leaf against a trained dataset of known tomato diseases and conditions.',
   },
   {
     num: '03',
     title: 'PRESCRIPTION',
     icon: RiMedicineBottleLine,
-    desc: 'Receive a detailed pathology report and immediate treatment protocols to arrest further crop loss.',
+    desc: 'Receive a detailed diagnosis report including disease identification, severity level, and immediate treatment protocols.',
   },
 ];
 
@@ -36,13 +36,13 @@ export default function Landing() {
             {/* Left — Text */}
             <div className="animate-slide-up pt-4">
               <h1 className="heading-hero mb-6 text-balance text-brand-secondary">
-                DIAGNOSTIC<br />
-                PRECISION FOR<br />
-                AGRICULTURE.
+                TOMATO LEAF<br />
+                DISEASE<br />
+                DETECTION.
               </h1>
               <p className="text-gray-600 text-lg max-w-md mb-10 leading-relaxed font-medium">
-                Identify plant diseases instantly using our high-contrast clinical analysis engine.
-                Upload a clear image of the affected leaf to begin.
+                Detect tomato diseases instantly by uploading a photo of the affected leaf.
+                Our AI identifies the condition and provides treatment recommendations.
               </p>
               {/* Call to action button that scrolls to upload */}
               <a href="#upload-section" className="btn-primary btn-lg rounded-full inline-flex">
@@ -70,8 +70,8 @@ export default function Landing() {
         <section id="upload-section" className="py-20 bg-brand-primary-light">
           <div className="page-container max-w-3xl">
             <div className="text-center mb-10">
-              <h2 className="heading-section text-brand-secondary mb-4">ANALYZE YOUR PLANT</h2>
-              <p className="text-gray-600 font-medium">Upload a clear photo of the symptomatic leaf. Our AI will handle the rest.</p>
+              <h2 className="heading-section text-brand-secondary mb-4">SCAN YOUR TOMATO LEAF</h2>
+              <p className="text-gray-600 font-medium">Upload a clear photo of the tomato leaf you want to diagnose. Our AI will handle the rest.</p>
             </div>
             <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
               <UploadArea />

@@ -115,4 +115,33 @@ const getDiagnosis = async (req, res, next) => {
   }
 };
 
-module.exports = { uploadDiagnosis, getHistory, getDiagnosis };
+// DELETE /api/diagnoses/:id
+const deleteDiagnosis = async (req, res, next) => {
+  try {
+    // Verify ownership first
+    const { data, error: fetchError } = await supabase
+      .from('diagnoses')
+      .select('id, user_id')
+      .eq('id', req.params.id)
+      .single();
+
+    if (fetchError || !data) return res.status(404).json({ error: 'Diagnosis not found' });
+
+    if (data.user_id && data.user_id !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const { error: deleteError } = await supabase
+      .from('diagnoses')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (deleteError) throw deleteError;
+
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { uploadDiagnosis, getHistory, getDiagnosis, deleteDiagnosis };

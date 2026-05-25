@@ -27,6 +27,7 @@ export const diagnosisService = {
   },
   getHistory:  (params) => api.get('/diagnoses/history', { params }),
   getDiagnosis: (id)    => api.get(`/diagnoses/${id}`),
+  deleteDiagnosis: (id) => api.delete(`/diagnoses/${id}`),
 };
 
 export const forumService = {

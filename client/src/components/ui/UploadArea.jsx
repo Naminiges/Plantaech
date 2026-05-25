@@ -28,7 +28,7 @@ export default function UploadArea() {
   const handleAnalyze = async () => {
     if (!file) { inputRef.current?.click(); return; }
     setLoading(true);
-    const toastId = toast.loading('Analyzing plant image...');
+    const toastId = toast.loading('Analyzing tomato leaf...');
     try {
       const { data } = await diagnosisService.upload(file);
       toast.success('Analysis complete!', { id: toastId });
@@ -66,8 +66,8 @@ export default function UploadArea() {
             <div className="border-2 border-dashed border-gray-300 p-4 rounded">
               <RiImageLine className="text-3xl" />
             </div>
-            <p className="text-xs font-medium uppercase tracking-wider">VISUAL ANALYSIS AREA</p>
-            <p className="text-xs text-gray-300">Click or drag & drop an image</p>
+            <p className="text-xs font-medium uppercase tracking-wider">TOMATO LEAF SCAN AREA</p>
+            <p className="text-xs text-gray-300">Click or drag & drop an image of a tomato leaf</p>
           </div>
         )}
       </div>
@@ -81,7 +81,7 @@ export default function UploadArea() {
       >
         {loading
           ? <><span className="spinner w-4 h-4 border-white border-t-transparent" /> Analyzing...</>
-          : <><RiUpload2Line className="text-lg" /> {file ? 'ANALYZE IMAGE' : 'UPLOAD PLANT PHOTO'}</>
+          : <><RiUpload2Line className="text-lg" /> {file ? 'ANALYZE LEAF' : 'UPLOAD TOMATO LEAF'}</>
         }
       </button>
     </div>

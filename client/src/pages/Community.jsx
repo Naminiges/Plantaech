@@ -53,7 +53,7 @@ export default function Community() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 border-b border-gray-200 pb-6">
             <div>
               <h1 className="heading-section text-brand-secondary mb-2">COMMUNITY FORUM</h1>
-              <p className="text-gray-500 font-medium">Discuss plant diseases, get tips, and share your agricultural knowledge.</p>
+              <p className="text-gray-500 font-medium">Discuss tomato diseases, share growing tips, and connect with fellow growers.</p>
             </div>
             {isAuthenticated
               ? <Link to="/community/new" id="new-question-btn" className="btn-primary rounded-full px-6 flex items-center gap-2"><RiAddLine className="text-lg" /> Ask Question</Link>
