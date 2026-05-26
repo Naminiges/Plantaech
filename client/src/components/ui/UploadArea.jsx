@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { diagnosisService } from '../../services';
-import { RiUpload2Line, RiImageLine, RiCloseLine } from 'react-icons/ri';
+import { RiUpload2Line, RiImageLine, RiCloseLine, RiScan2Line } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 
 export default function UploadArea() {
@@ -81,7 +81,7 @@ export default function UploadArea() {
       >
         {loading
           ? <><span className="spinner w-4 h-4 border-white border-t-transparent" /> Analyzing...</>
-          : <><RiUpload2Line className="text-lg" /> {file ? 'ANALYZE LEAF' : 'UPLOAD TOMATO LEAF'}</>
+          : <>{file ? <RiScan2Line className="text-lg" /> : <RiUpload2Line className="text-lg" />} {file ? 'ANALYZE LEAF' : 'UPLOAD TOMATO LEAF'}</>
         }
       </button>
     </div>
