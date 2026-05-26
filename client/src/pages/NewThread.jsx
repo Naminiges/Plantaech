@@ -24,20 +24,31 @@ export default function NewThread() {
   const [image, setImage]       = useState(null);   // File object
   const [preview, setPreview]   = useState(null);   // data URL for preview
   const [loading, setLoading]   = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   const toggleTag = (tag) => setForm(f => ({
     ...f,
     tags: f.tags.includes(tag) ? f.tags.filter(t => t !== tag) : [...f.tags, tag]
   }));
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
+  const handleFile = (file) => {
     if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
     if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5 MB'); return; }
     setImage(file);
     const reader = new FileReader();
     reader.onload = (ev) => setPreview(ev.target.result);
     reader.readAsDataURL(file);
+  };
+
+  const handleImageChange = (e) => {
+    handleFile(e.target.files?.[0]);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragging(false);
+    handleFile(e.dataTransfer.files?.[0]);
   };
 
   const removeImage = () => { setImage(null); setPreview(null); if (fileRef.current) fileRef.current.value = ''; };
@@ -124,7 +135,10 @@ export default function NewThread() {
               ) : (
                 <button type="button" id="attach-image-btn"
                   onClick={() => fileRef.current?.click()}
-                  className="mt-2 w-full border-2 border-dashed border-gray-200 hover:border-brand-accent hover:bg-brand-primary-light rounded-2xl py-12 flex flex-col items-center gap-3 text-gray-400 hover:text-brand-secondary transition-all">
+                  onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={handleDrop}
+                  className={`mt-2 w-full border-2 border-dashed rounded-2xl py-12 flex flex-col items-center gap-3 transition-all duration-200 ${dragging ? 'border-brand-accent bg-brand-primary-light text-brand-secondary scale-[0.99]' : 'border-gray-200 text-gray-400 hover:border-brand-accent hover:bg-brand-primary-light hover:text-brand-secondary'}`}>
                   <RiImageAddLine className="text-4xl" />
                   <span className="text-sm font-medium">Click to browse or drag and drop an image</span>
                   <span className="text-xs text-gray-400 font-normal">PNG, JPG, WEBP up to 5MB</span>
