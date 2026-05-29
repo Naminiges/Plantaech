@@ -104,14 +104,17 @@ export function exportDiagnosisPdf(diagnosis) {
   if (meta.model_version) addWrapped(`Model Version: ${meta.model_version}`, 9, { color: [120, 120, 120] });
   if (meta.analyzed_at) addWrapped(`Analyzed At: ${new Date(meta.analyzed_at).toLocaleString()}`, 9, { color: [120, 120, 120] });
 
-  // Top-K predictions
-  if (meta.top_k && meta.top_k.length > 0) {
+  // Top-K predictions (only show if confidence is 80% or below)
+  const showTopK = diagnosis.confidence != null && diagnosis.confidence <= 80;
+  if (showTopK && meta.top_k && meta.top_k.length > 0) {
     y += 2;
     addWrapped('Top Predictions:', 9, { bold: true, color: [120, 120, 120] });
     meta.top_k.forEach((pred, i) => {
-      const name = pred.class_name || 'Unknown';
+      // Beautify class name: remove 'Tomato_' prefix and replace underscores with spaces
+      const rawName = pred.class_name || 'Unknown';
+      const beautifiedName = rawName.replace(/^Tomato_/, '').replace(/_/g, ' ');
       const pconf = (pred.confidence * 100).toFixed(1);
-      addWrapped(`  ${i + 1}. ${name} — ${pconf}%`, 9, { color: [120, 120, 120] });
+      addWrapped(`  ${i + 1}. ${beautifiedName} — ${pconf}%`, 9, { color: [120, 120, 120] });
     });
   }
 
