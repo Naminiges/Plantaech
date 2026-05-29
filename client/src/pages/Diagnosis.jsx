@@ -65,11 +65,7 @@ export default function Diagnosis() {
                   : <div className="text-gray-300 text-center"><p className="text-4xl mb-2">🌿</p><p className="text-xs">No image available</p></div>
                 }
               </div>
-              <div className="grid grid-cols-3 gap-4 text-xs">
-                <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm text-center">
-                  <p className="text-brand-accent font-bold uppercase tracking-widest mb-1.5 text-[10px]">Confidence</p>
-                  <p className="font-black text-brand-secondary text-lg">{diagnosis.confidence?.toFixed(1)}%</p>
-                </div>
+              <div className="grid grid-cols-2 gap-4 text-xs">
                 <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm text-center flex flex-col items-center justify-center">
                   <p className="text-brand-accent font-bold uppercase tracking-widest mb-1.5 text-[10px]">Status</p>
                   <span className={`badge ${severity === 'healthy' ? 'bg-brand-accent text-white border-brand-accent' : severity === 'mild' ? 'bg-amber-500 text-white border-amber-500' : 'bg-red-500 text-white border-red-500'} scale-90 origin-center`}>{severity}</span>
@@ -83,16 +79,6 @@ export default function Diagnosis() {
 
             {/* Right — Results */}
             <div className="space-y-8 animate-slide-up">
-              {/* Confidence bar */}
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <div className="flex items-end justify-between mb-4">
-                  <p className="text-xs text-brand-accent font-bold uppercase tracking-widest">Diagnostic Confidence</p>
-                  <p className="text-4xl font-black text-brand-secondary">{diagnosis.confidence?.toFixed(1)}%</p>
-                </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-brand-accent rounded-full transition-all duration-1000" style={{ width: `${diagnosis.confidence}%` }} />
-                </div>
-              </div>
 
               {/* Disease name */}
               <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden z-0">
