@@ -119,4 +119,85 @@ const deletePost = async (req, res, next) => {
   }
 };
 
-module.exports = { getStats, getUsers, updateUserRole, banUser, getPosts, pinPost, deletePost };
+// ── Disease Management ─────────────────────────────────────────
+const { clearDiseaseCache } = require('../services/aiService');
+
+// GET /api/admin/diseases
+const getDiseases = async (req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('diseases')
+      .select('*')
+      .order('id', { ascending: true });
+    if (error) throw error;
+    res.json({ diseases: data });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// POST /api/admin/diseases
+const createDisease = async (req, res, next) => {
+  try {
+    const { class_key, disease_name, scientific_name, severity, immediate_action, treatment_plan } = req.body;
+    if (!class_key || !disease_name) {
+      return res.status(400).json({ error: 'class_key and disease_name are required' });
+    }
+    const { data, error } = await supabase
+      .from('diseases')
+      .insert({ class_key, disease_name, scientific_name: scientific_name || null, severity: severity || null, immediate_action, treatment_plan })
+      .select()
+      .single();
+    if (error) throw error;
+    clearDiseaseCache();
+    res.status(201).json({ disease: data });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// PUT /api/admin/diseases/:id
+const updateDisease = async (req, res, next) => {
+  try {
+    const { disease_name, scientific_name, severity, immediate_action, treatment_plan } = req.body;
+    const updates = {};
+    if (disease_name !== undefined) updates.disease_name = disease_name;
+    if (scientific_name !== undefined) updates.scientific_name = scientific_name || null;
+    if (severity !== undefined) updates.severity = severity || null;
+    if (immediate_action !== undefined) updates.immediate_action = immediate_action;
+    if (treatment_plan !== undefined) updates.treatment_plan = treatment_plan;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
+    const { data, error } = await supabase
+      .from('diseases')
+      .update(updates)
+      .eq('id', req.params.id)
+      .select()
+      .single();
+    if (error) throw error;
+    clearDiseaseCache();
+    res.json({ disease: data });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// DELETE /api/admin/diseases/:id
+const deleteDisease = async (req, res, next) => {
+  try {
+    const { error } = await supabase
+      .from('diseases')
+      .delete()
+      .eq('id', req.params.id);
+    if (error) throw error;
+    clearDiseaseCache();
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { getStats, getUsers, updateUserRole, banUser, getPosts, pinPost, deletePost, getDiseases, createDisease, updateDisease, deleteDisease };

@@ -18,6 +18,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsers     from './pages/admin/Users';
 import AdminPosts     from './pages/admin/Posts';
 import AdminReports   from './pages/admin/Reports';
+import AdminDiseases  from './pages/admin/Diseases';
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/community" element={<Community />} />
           <Route path="/community/:id" element={<ThreadDetail />} />
+          <Route path="/diagnosis/result" element={<Diagnosis />} />
           <Route path="/diagnosis/:id" element={<Diagnosis />} />
 
           {/* Auth-protected routes */}
@@ -50,6 +52,7 @@ export default function App() {
           <Route path="/admin/users"     element={<AdminRoute><AdminUsers /></AdminRoute>} />
           <Route path="/admin/posts"     element={<AdminRoute><AdminPosts /></AdminRoute>} />
           <Route path="/admin/reports"   element={<AdminRoute><AdminReports /></AdminRoute>} />
+          <Route path="/admin/diseases"  element={<AdminRoute><AdminDiseases /></AdminRoute>} />
 
           {/* 404 fallback */}
           <Route path="*" element={<div className="flex items-center justify-center min-h-screen"><div className="text-center"><p className="text-6xl font-black mb-4">404</p><p className="text-gray-500">Page not found.</p></div></div>} />

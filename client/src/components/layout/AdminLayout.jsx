@@ -1,11 +1,12 @@
 import { NavLink, Link } from 'react-router-dom';
-import { RiDashboardLine, RiUserLine, RiFlag2Line, RiFileList2Line, RiArrowLeftLine, RiPlantLine } from 'react-icons/ri';
+import { RiDashboardLine, RiUserLine, RiFlag2Line, RiFileList2Line, RiArrowLeftLine, RiPlantLine, RiVirusLine } from 'react-icons/ri';
 
 const NAV = [
-  { to: '/admin',         label: 'Dashboard', icon: RiDashboardLine, end: true },
-  { to: '/admin/users',   label: 'Users',     icon: RiUserLine },
-  { to: '/admin/posts',   label: 'Posts',     icon: RiFileList2Line },
-  { to: '/admin/reports', label: 'Reports',   icon: RiFlag2Line },
+  { to: '/admin',           label: 'Dashboard', icon: RiDashboardLine, end: true },
+  { to: '/admin/users',     label: 'Users',     icon: RiUserLine },
+  { to: '/admin/posts',     label: 'Posts',     icon: RiFileList2Line },
+  { to: '/admin/reports',   label: 'Reports',   icon: RiFlag2Line },
+  { to: '/admin/diseases',  label: 'Diseases',  icon: RiVirusLine },
 ];
 
 export default function AdminLayout({ children, title }) {

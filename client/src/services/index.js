@@ -69,4 +69,9 @@ export const adminService = {
   deletePost:     (id)       => api.delete(`/admin/posts/${id}`),
   getReports:     (params)   => api.get('/reports', { params }),
   updateReport:   (id, status) => api.put(`/reports/${id}`, { status }),
+  // Disease management
+  getDiseases:    ()         => api.get('/admin/diseases'),
+  createDisease:  (data)     => api.post('/admin/diseases', data),
+  updateDisease:  (id, data) => api.put(`/admin/diseases/${id}`, data),
+  deleteDisease:  (id)       => api.delete(`/admin/diseases/${id}`),
 };

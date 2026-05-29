@@ -9,6 +9,23 @@ const uploadDiagnosis = async (req, res, next) => {
 
     const result = await aiService.analyzeImage(req.file);
 
+    // If the model says "Not a Tomato Leaf", return result without saving to DB/storage
+    if (!result.severity) {
+      return res.status(200).json({
+        diagnosis: {
+          disease_name: result.disease_name,
+          scientific_name: result.scientific_name,
+          confidence: result.confidence,
+          severity: result.severity,
+          immediate_action: result.immediate_action,
+          treatment_plan: result.treatment_plan,
+          metadata: result.metadata || {},
+          created_at: new Date().toISOString(),
+        },
+        persisted: false,
+      });
+    }
+
     const objectKey = storage.buildObjectKey('diagnoses', req.file.originalname);
     const imageUrl = await storage.uploadDiagnosisImage(req.file, objectKey);
 

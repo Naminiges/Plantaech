@@ -12,8 +12,30 @@ const SEVERITY_BADGE = { healthy: 'badge-success', mild: 'badge-warning', modera
 export default function Diagnosis() {
   const { id } = useParams();
   const location = useLocation();
-  const [diagnosis, setDiagnosis] = useState(location.state?.diagnosis || null);
-  const [loading, setLoading]     = useState(!diagnosis);
+
+  const getInitialDiagnosis = () => {
+    if (location.state?.diagnosis) {
+      return location.state.diagnosis;
+    }
+    // Check localStorage
+    try {
+      const stored = localStorage.getItem('plantaech_unrecognized_diagnosis');
+      if (stored) {
+        const { diagnosis: storedDiagnosis, expiresAt } = JSON.parse(stored);
+        if (expiresAt > Date.now()) {
+          return storedDiagnosis;
+        } else {
+          localStorage.removeItem('plantaech_unrecognized_diagnosis');
+        }
+      }
+    } catch (e) {
+      console.error('Error reading unrecognized diagnosis from localStorage', e);
+    }
+    return null;
+  };
+
+  const [diagnosis, setDiagnosis] = useState(getInitialDiagnosis);
+  const [loading, setLoading]     = useState(!diagnosis && !!id);
 
   useEffect(() => {
     if (!diagnosis && id) {
@@ -34,9 +56,20 @@ export default function Diagnosis() {
 
   if (!diagnosis) return (
     <div className="min-h-screen flex flex-col"><Navbar />
-      <div className="flex-1 flex flex-col items-center justify-center gap-4" style={{paddingTop:'var(--nav-height)'}}>
-        <p className="text-gray-500">Diagnosis not found.</p>
-        <Link to="/" className="btn-primary btn-sm">Go Home</Link>
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-4" style={{paddingTop:'var(--nav-height)'}}>
+        {location.pathname === '/diagnosis/result' ? (
+          <>
+            <p className="text-5xl mb-2">⏰</p>
+            <p className="text-gray-500 max-w-md font-bold text-lg">Temporary diagnosis expired or not found</p>
+            <p className="text-xs text-gray-400 max-w-xs leading-relaxed">For your privacy and resource optimization, unrecognized images are stored locally and expire after 2 minutes.</p>
+            <Link to="/" className="btn-primary btn-sm rounded-full px-6 mt-3 shadow-md">Start Diagnosis</Link>
+          </>
+        ) : (
+          <>
+            <p className="text-gray-500 font-medium">Diagnosis not found.</p>
+            <Link to="/" className="btn-primary btn-sm rounded-full px-6 shadow-md">Go Home</Link>
+          </>
+        )}
       </div>
     </div>
   );
@@ -46,6 +79,7 @@ export default function Diagnosis() {
   const isNotPlant = !severity;
   const API_BASE = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000';
   const imageSrc = diagnosis.image_signed_url
+    || diagnosis.image_base64
     || (diagnosis.image_url
       ? (diagnosis.image_url.startsWith('http') ? diagnosis.image_url : `${API_BASE}${diagnosis.image_url}`)
       : null);
@@ -86,7 +120,6 @@ export default function Diagnosis() {
 
             {/* Right — Results */}
             <div className="space-y-8 animate-slide-up">
-
               {/* Disease name */}
               <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden z-0">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary-light rounded-bl-full opacity-50 -z-10"></div>
@@ -136,7 +169,7 @@ export default function Diagnosis() {
               )}
 
               {isNotPlant && (
-                <div className="bg-gray-50 border border-gray-200 p-6 rounded-3xl shadow-sm">
+                <div className="bg-gray-50 border border-gray-200 p-6 rounded-3xl shadow-sm relative overflow-hidden">
                   <p className="text-lg font-black text-gray-700 mb-2 flex items-center gap-2">
                     <span className="w-8 h-8 rounded-full bg-gray-400 text-white flex items-center justify-center text-sm">?</span> Not Recognized
                   </p>
