@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { diagnosisService } from '../services';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
-import { RiAlertLine, RiCalendarLine, RiDownload2Line, RiShareLine } from 'react-icons/ri';
+import { RiAlertLine, RiCalendarLine, RiDownload2Line, RiShareLine, RiCameraLine } from 'react-icons/ri';
 import { exportDiagnosisPdf } from '../utils/exportPdf';
 import toast from 'react-hot-toast';
 
@@ -159,6 +159,13 @@ export default function Diagnosis() {
                     <RiDownload2Line className="text-lg" /> EXPORT DATA
                   </button>
                 </div>
+              </div>
+
+              {/* Start New Diagnosis Button */}
+              <div className="flex justify-end pt-2">
+                <Link to="/" className="btn-primary rounded-full px-8 py-3 flex items-center gap-2 font-bold shadow-md hover:-translate-y-1 hover:shadow-lg transition-all">
+                  <RiCameraLine className="text-xl" /> NEW DIAGNOSIS
+                </Link>
               </div>
             </div>
           </div>
