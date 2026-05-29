@@ -1,5 +1,12 @@
+const multer = require('multer');
+
 const errorHandler = (err, req, res, next) => {
   console.error(err.stack || err.message || err);
+
+  // Multer file size limit exceeded
+  if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ error: 'File is too large. Maximum allowed size is 10MB.' });
+  }
 
   if (err.name === 'ValidationError') {
     return res.status(400).json({ error: err.message });
