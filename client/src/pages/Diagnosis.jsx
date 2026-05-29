@@ -148,18 +148,20 @@ export default function Diagnosis() {
               )}
 
               {/* Export banner */}
-              <div className="bg-brand-secondary border border-brand-secondary p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute -right-6 -bottom-10 text-brand-primary-light/10 text-9xl">🌿</div>
-                <div className="relative z-10">
-                  <p className="text-xs font-bold uppercase tracking-widest text-brand-primary-light mb-1.5">Expert Consultation Required?</p>
-                  <p className="text-sm text-gray-300">Download Comprehensive PDF Report</p>
+              {!isNotPlant && (
+                <div className="bg-brand-secondary border border-brand-secondary p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                  <div className="absolute -right-6 -bottom-10 text-brand-primary-light/10 text-9xl">🌿</div>
+                  <div className="relative z-10">
+                    <p className="text-xs font-bold uppercase tracking-widest text-brand-primary-light mb-1.5">Expert Consultation Required?</p>
+                    <p className="text-sm text-gray-300">Download Comprehensive PDF Report</p>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0 relative z-10">
+                    <button onClick={() => exportDiagnosisPdf(diagnosis)} className="btn bg-white text-brand-secondary hover:bg-brand-primary-light hover:text-brand-secondary rounded-full px-6 py-2.5 flex items-center gap-2 text-sm font-bold transition-colors shadow-md">
+                      <RiDownload2Line className="text-lg" /> EXPORT DATA
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2 flex-shrink-0 relative z-10">
-                  <button onClick={() => exportDiagnosisPdf(diagnosis)} className="btn bg-white text-brand-secondary hover:bg-brand-primary-light hover:text-brand-secondary rounded-full px-6 py-2.5 flex items-center gap-2 text-sm font-bold transition-colors shadow-md">
-                    <RiDownload2Line className="text-lg" /> EXPORT DATA
-                  </button>
-                </div>
-              </div>
+              )}
 
               {/* Start New Diagnosis Button */}
               <div className="flex justify-end pt-2">
