@@ -87,8 +87,7 @@ export default function History() {
                     </div>
                     <div className="p-5 flex-1 flex flex-col">
                       <p className="font-bold text-base text-brand-secondary uppercase tracking-wide mb-3">{d.disease_name}</p>
-                      <div className="mt-auto flex items-center justify-between text-sm text-gray-500 font-medium">
-                        <span className="bg-gray-100 px-2 py-1 rounded-md">{d.confidence?.toFixed(1)}% match</span>
+                      <div className="mt-auto flex items-center justify-end text-sm text-gray-500 font-medium">
                         <span>{new Date(d.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </div>
                     </div>
