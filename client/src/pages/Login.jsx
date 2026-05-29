@@ -89,7 +89,7 @@ export default function Login() {
               </div>
 
               <div className="text-center pt-2">
-                <button type="button" id="reset-password-btn" className="text-sm font-medium text-brand-secondary hover:underline">Forgotten password?</button>
+                <Link to="/forgot-password" id="reset-password-btn" className="text-sm font-medium text-brand-secondary hover:underline">Forgotten password?</Link>
               </div>
 
               <div className="flex items-center py-4">

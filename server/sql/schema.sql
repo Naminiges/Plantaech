@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   phone TEXT,
   password TEXT NOT NULL,
-  avatar TEXT,
+  avatar TEXT CHECK (
+    avatar IS NULL OR avatar LIKE 'http%' OR avatar LIKE 'supabase-private://%'
+  ),
   role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin')),
   is_banned BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now(),
@@ -22,7 +24,9 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS diagnoses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  image_url TEXT NOT NULL,
+  image_url TEXT NOT NULL CHECK (
+    image_url LIKE 'http%' OR image_url LIKE 'supabase-private://%'
+  ),
   disease_name TEXT NOT NULL,
   scientific_name TEXT,
   confidence FLOAT NOT NULL,
@@ -38,7 +42,9 @@ CREATE TABLE IF NOT EXISTS threads (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   content TEXT NOT NULL,
-  image_url TEXT,
+  image_url TEXT CHECK (
+    image_url IS NULL OR image_url LIKE 'http%' OR image_url LIKE 'supabase-private://%'
+  ),
   category TEXT CHECK (category IN (
     'penyakit_tanaman', 'tips_pertanian', 'tanya_jawab',
     'pupuk_nutrisi', 'hama_pengendalian', 'umum'

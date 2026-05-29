@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { diagnosisService } from '../services';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
-import { RiHistoryLine } from 'react-icons/ri';
+import { RiHistoryLine, RiDeleteBinLine } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 
 const SEV = { healthy: 'badge-success', mild: 'badge-warning', moderate: 'badge-warning', severe: 'badge-danger' };
@@ -23,6 +23,20 @@ export default function History() {
       .finally(() => setLoading(false));
   }, [page]);
 
+  const handleDelete = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm('Delete this diagnosis? This cannot be undone.')) return;
+    try {
+      await diagnosisService.deleteDiagnosis(id);
+      setData(prev => prev.filter(d => d.id !== id));
+      setTotal(prev => prev - 1);
+      toast.success('Diagnosis deleted');
+    } catch {
+      toast.error('Failed to delete diagnosis');
+    }
+  };
+
   const API_BASE = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000';
 
   return (
@@ -32,7 +46,7 @@ export default function History() {
         <div className="page-container py-12">
           <div className="mb-10 border-b border-gray-200 pb-6">
             <h1 className="heading-section text-brand-secondary mb-2">DIAGNOSIS HISTORY</h1>
-            <p className="text-gray-500 font-medium">Track and monitor your past plant health analyses.</p>
+            <p className="text-gray-500 font-medium">Track and review your past tomato leaf scans and diagnoses.</p>
           </div>
           {loading ? (
             <div className="flex justify-center py-20"><div className="spinner w-8 h-8" /></div>
@@ -41,8 +55,8 @@ export default function History() {
               <div className="w-24 h-24 bg-brand-primary-light rounded-full flex items-center justify-center mx-auto mb-6">
                 <RiHistoryLine className="text-5xl text-brand-accent" />
               </div>
-              <p className="text-gray-500 mb-8 font-medium text-lg">No diagnoses yet. Start scanning your plants!</p>
-              <Link to="/" className="btn-primary btn-lg rounded-full px-8">Analyze your first plant</Link>
+              <p className="text-gray-500 mb-8 font-medium text-lg">No diagnoses yet. Start scanning your tomato leaves!</p>
+              <Link to="/" className="btn-primary btn-lg rounded-full px-8">Scan your first leaf</Link>
             </div>
           ) : (
             <>
@@ -50,12 +64,25 @@ export default function History() {
                 {data.map(d => (
                   <Link key={d.id} to={`/diagnosis/${d.id}`} state={{diagnosis: d}} className="card-hover overflow-hidden block flex flex-col h-full bg-white">
                     <div className="aspect-video bg-gray-100 overflow-hidden relative">
-                      {d.image_url
-                        ? <img src={`${API_BASE}${d.image_url}`} alt={d.disease_name} className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl bg-brand-primary-light">🌿</div>
-                      }
-                      <div className="absolute top-3 right-3">
-                        <span className={`badge shadow-sm ${SEV[d.severity] || 'badge-outline'}`}>{d.severity}</span>
+                      {(() => {
+                        const imageSrc = d.image_signed_url
+                          || (d.image_url
+                            ? (d.image_url.startsWith('http') ? d.image_url : `${API_BASE}${d.image_url}`)
+                            : null);
+                        return imageSrc
+                          ? <img src={imageSrc} alt={d.disease_name} className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl bg-brand-primary-light">🌿</div>;
+                      })()}
+                      
+                      <div className="absolute top-3 right-3 flex gap-1.5">
+                        <button
+                          onClick={(e) => handleDelete(e, d.id)}
+                          className="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-red-50 hover:text-red-500 transition-colors text-gray-400"
+                          title="Delete diagnosis"
+                        >
+                          <RiDeleteBinLine className="text-sm" />
+                        </button>
+                        <span className={`badge shadow-sm ${d.severity ? (SEV[d.severity] || 'badge-outline') : 'bg-gray-400 text-white border-gray-400'}`}>{d.severity || 'unrecognized'}</span>
                       </div>
                     </div>
                     <div className="p-5 flex-1 flex flex-col">

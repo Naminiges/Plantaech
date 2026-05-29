@@ -1,14 +1,16 @@
 const supabase = require('../config/supabase');
 const aiService = require('../services/aiService');
-const path = require('path');
+const storage = require('../services/storage');
 
 // POST /api/diagnoses/upload
 const uploadDiagnosis = async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Image file is required' });
 
-    const imageUrl = `/uploads/${req.file.filename}`;
-    const result = await aiService.analyzeImage(req.file.path);
+    const result = await aiService.analyzeImage(req.file);
+
+    const objectKey = storage.buildObjectKey('diagnoses', req.file.originalname);
+    const imageUrl = await storage.uploadDiagnosisImage(req.file, objectKey);
 
     const diagnosisData = {
       image_url: imageUrl,
@@ -29,7 +31,19 @@ const uploadDiagnosis = async (req, res, next) => {
       .single();
 
     if (error) throw error;
-    res.status(201).json({ diagnosis });
+
+    // Create signed URL for immediate display
+    let response = diagnosis;
+    if (diagnosis.image_url && diagnosis.image_url.startsWith('supabase-private://')) {
+      try {
+        const signedUrl = await storage.createSignedUrlFromStoragePath(diagnosis.image_url, 60 * 60);
+        response = { ...diagnosis, image_signed_url: signedUrl };
+      } catch (e) {
+        // ignore signed url errors, return diagnosis as-is
+      }
+    }
+
+    res.status(201).json({ diagnosis: response });
   } catch (err) {
     next(err);
   }
@@ -50,7 +64,20 @@ const getHistory = async (req, res, next) => {
       .range(from, to);
 
     if (error) throw error;
-    res.json({ diagnoses: data, total: count, page: parseInt(page), limit: parseInt(limit) });
+
+    const diagnoses = await Promise.all((data || []).map(async (d) => {
+      if (d.image_url && d.image_url.startsWith('supabase-private://')) {
+        try {
+          const signedUrl = await storage.createSignedUrlFromStoragePath(d.image_url, 60 * 60);
+          return { ...d, image_signed_url: signedUrl };
+        } catch (e) {
+          return d;
+        }
+      }
+      return d;
+    }));
+
+    res.json({ diagnoses, total: count, page: parseInt(page), limit: parseInt(limit) });
   } catch (err) {
     next(err);
   }
@@ -72,10 +99,49 @@ const getDiagnosis = async (req, res, next) => {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    res.json({ diagnosis: data });
+    let diagnosis = data;
+    if (data.image_url && data.image_url.startsWith('supabase-private://')) {
+      try {
+        const signedUrl = await storage.createSignedUrlFromStoragePath(data.image_url, 60 * 60);
+        diagnosis = { ...data, image_signed_url: signedUrl };
+      } catch (e) {
+        // ignore signed url errors
+      }
+    }
+
+    res.json({ diagnosis });
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = { uploadDiagnosis, getHistory, getDiagnosis };
+// DELETE /api/diagnoses/:id
+const deleteDiagnosis = async (req, res, next) => {
+  try {
+    // Verify ownership first
+    const { data, error: fetchError } = await supabase
+      .from('diagnoses')
+      .select('id, user_id')
+      .eq('id', req.params.id)
+      .single();
+
+    if (fetchError || !data) return res.status(404).json({ error: 'Diagnosis not found' });
+
+    if (data.user_id && data.user_id !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const { error: deleteError } = await supabase
+      .from('diagnoses')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (deleteError) throw deleteError;
+
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { uploadDiagnosis, getHistory, getDiagnosis, deleteDiagnosis };

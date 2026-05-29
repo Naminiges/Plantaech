@@ -6,6 +6,7 @@ import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 import Landing      from './pages/Landing';
 import Login        from './pages/Login';
 import Register     from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Diagnosis    from './pages/Diagnosis';
 import History      from './pages/History';
 import Community    from './pages/Community';
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/"          element={<Landing />} />
           <Route path="/login"     element={<Login />} />
           <Route path="/register"  element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/community" element={<Community />} />
           <Route path="/community/:id" element={<ThreadDetail />} />
           <Route path="/diagnosis/:id" element={<Diagnosis />} />

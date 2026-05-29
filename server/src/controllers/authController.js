@@ -11,6 +11,7 @@ const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 const generateToken = (userId) =>
   jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
+
 // POST /api/auth/register
 const register = async (req, res, next) => {
   try {
@@ -105,4 +106,39 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, getMe, changePassword };
+// POST /api/auth/forgot-password
+// Repurposed: requires email + current password + new password
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email, current_password, new_password } = req.body;
+    if (!email || !current_password || !new_password) {
+      return res.status(400).json({ error: 'email, current_password, and new_password are required' });
+    }
+    if (new_password.length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    }
+    if (!PASSWORD_REGEX.test(new_password)) {
+      return res.status(400).json({ error: 'Password must contain at least 1 uppercase letter and 1 number' });
+    }
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, password, is_banned')
+      .eq('email', email)
+      .single();
+
+    if (error || !user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (user.is_banned) return res.status(403).json({ error: 'Account is banned' });
+
+    const valid = await bcrypt.compare(current_password, user.password);
+    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const hashed = await bcrypt.hash(new_password, 12);
+    await supabase.from('users').update({ password: hashed }).eq('id', user.id);
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, login, getMe, changePassword, forgotPassword };

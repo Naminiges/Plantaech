@@ -4,7 +4,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
-const fs = require('fs');
 
 const authRoutes = require('./routes/auth');
 const diagnosisRoutes = require('./routes/diagnoses');
@@ -37,11 +36,6 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ── Static uploads ─────────────────────────────────────────────────
-const uploadDir = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-app.use('/uploads', express.static(uploadDir));
-
 // ── API Routes ─────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/diagnoses', diagnosisRoutes);
@@ -54,10 +48,10 @@ app.use('/api/users', userRoutes);
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
 // ── Serve built frontend in production ─────────────────────────────
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && process.env.SERVE_CLIENT === 'true') {
   const clientBuild = path.join(__dirname, '../../client/dist');
   app.use(express.static(clientBuild));
-  app.get('*', (req, res) => res.sendFile(path.join(clientBuild, 'index.html')));
+  app.get('{*path}', (req, res) => res.sendFile(path.join(clientBuild, 'index.html')));
 }
 
 // ── Error Handler ──────────────────────────────────────────────────

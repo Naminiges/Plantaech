@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const storage = require('../services/storage');
 
 // GET /api/forum/threads
 const getThreads = async (req, res, next) => {
@@ -82,7 +83,11 @@ const createThread = async (req, res, next) => {
       return res.status(400).json({ error: 'Invalid category' });
     }
 
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    let imageUrl = null;
+    if (req.file) {
+      const objectKey = storage.buildObjectKey('threads', req.file.originalname);
+      imageUrl = await storage.uploadPublicImage(req.file, objectKey);
+    }
 
     const { data, error } = await supabase
       .from('threads')
