@@ -1,5 +1,3 @@
-const nodemailer = require('nodemailer');
-
 const EMAIL_CONTENT = {
   registration: {
     subject: 'Verify Your Email — Plantaech',
@@ -14,7 +12,8 @@ const EMAIL_CONTENT = {
 };
 
 /**
- * Send an OTP email.
+ * Send an OTP email using Brevo (Sendinblue) HTTPS API.
+ * This bypasses Railway's SMTP block.
  * @param {string} to      – recipient email
  * @param {string} otp     – 6-digit OTP string
  * @param {'registration'|'password-reset'} purpose
@@ -22,13 +21,13 @@ const EMAIL_CONTENT = {
 const sendOtpEmail = async (to, otp, purpose = 'password-reset') => {
   const content = EMAIL_CONTENT[purpose] || EMAIL_CONTENT['password-reset'];
 
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const smtpUser = process.env.SMTP_USER; // Used as the sender email
 
-  if (!smtpUser || !smtpPass) {
+  if (!brevoApiKey || !smtpUser) {
     console.warn('\n' + '='.repeat(60));
-    console.warn('⚠️  GMAIL SMTP NOT CONFIGURED');
-    console.warn('Please add SMTP_USER and SMTP_PASS to your server/.env file.');
+    console.warn('⚠️  BREVO API KEY NOT CONFIGURED');
+    console.warn('Please add BREVO_API_KEY and SMTP_USER to your server/.env file (and Railway).');
     console.warn(`Recipient: ${to}`);
     console.warn(`Purpose:   ${purpose}`);
     console.warn(`OTP CODE:  ${otp}`);
@@ -36,19 +35,7 @@ const sendOtpEmail = async (to, otp, purpose = 'password-reset') => {
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  });
-
-  const mailOptions = {
-    from: `"Plantaech" <${smtpUser}>`,
-    to,
-    subject: content.subject,
-    html: `
+  const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
@@ -88,13 +75,39 @@ const sendOtpEmail = async (to, otp, purpose = 'password-reset') => {
     </td></tr>
   </table>
 </body>
-</html>`,
-  };
+</html>`;
 
   try {
-    await transporter.sendMail(mailOptions);
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: {
+          name: 'Plantaech',
+          email: smtpUser
+        },
+        to: [
+          {
+            email: to
+          }
+        ],
+        subject: content.subject,
+        htmlContent: htmlContent
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Brevo API error:', errorData);
+      throw new Error(`Failed to send OTP email: ${response.statusText}`);
+    }
+
   } catch (error) {
-    console.error('SMTP email error:', error);
+    console.error('Email sending error:', error);
     throw new Error('Failed to send OTP email');
   }
 };
