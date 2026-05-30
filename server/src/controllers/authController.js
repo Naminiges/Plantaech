@@ -250,7 +250,7 @@ const requestOtp = async (req, res, next) => {
 
     if (insertErr) throw insertErr;
 
-    // Send email via Gmail SMTP (Nodemailer)
+    // Send email via Brevo API
     await sendOtpEmail(email, otp);
 
     res.json(genericMsg);
