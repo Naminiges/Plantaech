@@ -5,7 +5,9 @@ export const authService = {
   login:    (data) => api.post('/auth/login', data),
   getMe:    ()     => api.get('/auth/me'),
   changePassword: (data) => api.put('/auth/password', data),
-  changePasswordWithEmail: (data) => api.post('/auth/forgot-password', data),
+  requestOtp:    (email) => api.post('/auth/forgot-password', { email }),
+  verifyOtp:     (data)  => api.post('/auth/verify-otp', data),
+  resetPassword: (data)  => api.post('/auth/reset-password', data),
 };
 
 export const userService = {
