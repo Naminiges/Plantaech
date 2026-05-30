@@ -5,6 +5,9 @@ export const authService = {
   login:    (data) => api.post('/auth/login', data),
   getMe:    ()     => api.get('/auth/me'),
   changePassword: (data) => api.put('/auth/password', data),
+  requestOtp:    (email) => api.post('/auth/forgot-password', { email }),
+  verifyOtp:     (data)  => api.post('/auth/verify-otp', data),
+  resetPassword: (data)  => api.post('/auth/reset-password', data),
 };
 
 export const userService = {
@@ -26,6 +29,7 @@ export const diagnosisService = {
   },
   getHistory:  (params) => api.get('/diagnoses/history', { params }),
   getDiagnosis: (id)    => api.get(`/diagnoses/${id}`),
+  deleteDiagnosis: (id) => api.delete(`/diagnoses/${id}`),
 };
 
 export const forumService = {
@@ -67,4 +71,9 @@ export const adminService = {
   deletePost:     (id)       => api.delete(`/admin/posts/${id}`),
   getReports:     (params)   => api.get('/reports', { params }),
   updateReport:   (id, status) => api.put(`/reports/${id}`, { status }),
+  // Disease management
+  getDiseases:    ()         => api.get('/admin/diseases'),
+  createDisease:  (data)     => api.post('/admin/diseases', data),
+  updateDisease:  (id, data) => api.put(`/admin/diseases/${id}`, data),
+  deleteDisease:  (id)       => api.delete(`/admin/diseases/${id}`),
 };

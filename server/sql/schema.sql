@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   phone TEXT,
   password TEXT NOT NULL,
-  avatar TEXT,
+  avatar TEXT CHECK (
+    avatar IS NULL OR avatar LIKE 'http%' OR avatar LIKE 'supabase-private://%'
+  ),
   role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin')),
   is_banned BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now(),
@@ -22,7 +24,9 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS diagnoses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  image_url TEXT NOT NULL,
+  image_url TEXT NOT NULL CHECK (
+    image_url LIKE 'http%' OR image_url LIKE 'supabase-private://%'
+  ),
   disease_name TEXT NOT NULL,
   scientific_name TEXT,
   confidence FLOAT NOT NULL,
@@ -33,12 +37,27 @@ CREATE TABLE IF NOT EXISTS diagnoses (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Diseases knowledge base (model class → treatment info)
+CREATE TABLE IF NOT EXISTS diseases (
+  id SERIAL PRIMARY KEY,
+  class_key TEXT UNIQUE NOT NULL,
+  disease_name TEXT NOT NULL,
+  scientific_name TEXT,
+  severity TEXT CHECK (severity IS NULL OR severity IN ('healthy', 'mild', 'moderate', 'severe')),
+  immediate_action TEXT,
+  treatment_plan TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- Forum threads
 CREATE TABLE IF NOT EXISTS threads (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   content TEXT NOT NULL,
-  image_url TEXT,
+  image_url TEXT CHECK (
+    image_url IS NULL OR image_url LIKE 'http%' OR image_url LIKE 'supabase-private://%'
+  ),
   category TEXT CHECK (category IN (
     'penyakit_tanaman', 'tips_pertanian', 'tanya_jawab',
     'pupuk_nutrisi', 'hama_pengendalian', 'umum'
@@ -93,6 +112,7 @@ CREATE INDEX IF NOT EXISTS idx_comments_thread_id ON comments(thread_id);
 CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
 CREATE INDEX IF NOT EXISTS idx_reports_reporter_id ON reports(reporter_id);
+CREATE INDEX IF NOT EXISTS idx_diseases_class_key ON diseases(class_key);
 
 -- ============================================================
 -- Updated_at trigger function
@@ -113,3 +133,19 @@ CREATE TRIGGER update_threads_updated_at BEFORE UPDATE ON threads
 
 CREATE TRIGGER update_comments_updated_at BEFORE UPDATE ON comments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_diseases_updated_at BEFORE UPDATE ON diseases
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================================
+-- Password Reset OTPs (auto-cleaned: rows deleted after use)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS password_resets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT NOT NULL,
+  otp_hash TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_password_resets_email ON password_resets(email);
+

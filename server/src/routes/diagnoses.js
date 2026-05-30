@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { uploadDiagnosis, getHistory, getDiagnosis } = require('../controllers/diagnosisController');
+const { uploadDiagnosis, getHistory, getDiagnosis, deleteDiagnosis } = require('../controllers/diagnosisController');
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 const { uploadPlant } = require('../middleware/upload');
 
@@ -13,5 +13,6 @@ router.post('/upload', optionalAuth, (req, res, next) => {
 
 router.get('/history', requireAuth, getHistory);
 router.get('/:id', requireAuth, getDiagnosis);
+router.delete('/:id', requireAuth, deleteDiagnosis);
 
 module.exports = router;
