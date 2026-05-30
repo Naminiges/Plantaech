@@ -1,17 +1,53 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const EMAIL_CONTENT = {
+  registration: {
+    subject: 'Verify Your Email — Plantaech',
+    heading: 'Email Verification Code',
+    body: 'Complete your registration by entering the verification code below in the app.',
+  },
+  'password-reset': {
+    subject: 'Your Password Reset Code — Plantaech',
+    heading: 'Password Reset Code',
+    body: 'We received a request to reset your password. Enter the verification code below in the app to continue.',
+  },
+};
 
 /**
- * Send a password-reset OTP email.
- * @param {string} to   – recipient email
- * @param {string} otp  – 6-digit OTP string
+ * Send an OTP email.
+ * @param {string} to      – recipient email
+ * @param {string} otp     – 6-digit OTP string
+ * @param {'registration'|'password-reset'} purpose
  */
-const sendOtpEmail = async (to, otp) => {
-  const { error } = await resend.emails.send({
-    from: 'Plantaech <onboarding@resend.dev>',
+const sendOtpEmail = async (to, otp, purpose = 'password-reset') => {
+  const content = EMAIL_CONTENT[purpose] || EMAIL_CONTENT['password-reset'];
+
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+
+  if (!smtpUser || !smtpPass) {
+    console.warn('\n' + '='.repeat(60));
+    console.warn('⚠️  GMAIL SMTP NOT CONFIGURED');
+    console.warn('Please add SMTP_USER and SMTP_PASS to your server/.env file.');
+    console.warn(`Recipient: ${to}`);
+    console.warn(`Purpose:   ${purpose}`);
+    console.warn(`OTP CODE:  ${otp}`);
+    console.warn('='.repeat(60) + '\n');
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Plantaech" <${smtpUser}>`,
     to,
-    subject: 'Your Password Reset Code — Plantaech',
+    subject: content.subject,
     html: `
 <!DOCTYPE html>
 <html>
@@ -30,9 +66,9 @@ const sendOtpEmail = async (to, otp) => {
         <!-- Body -->
         <tr>
           <td style="padding:40px;">
-            <h2 style="margin:0 0 8px;color:#111827;font-size:20px;font-weight:700;">Password Reset Code</h2>
+            <h2 style="margin:0 0 8px;color:#111827;font-size:20px;font-weight:700;">${content.heading}</h2>
             <p style="margin:0 0 28px;color:#6b7280;font-size:14px;line-height:1.6;">
-              We received a request to reset your password. Enter the verification code below in the app to continue.
+              ${content.body}
             </p>
             <!-- OTP box -->
             <div style="background:#f9fafb;border:2px dashed #d1d5db;border-radius:12px;padding:24px;text-align:center;margin-bottom:28px;">
@@ -53,10 +89,12 @@ const sendOtpEmail = async (to, otp) => {
   </table>
 </body>
 </html>`,
-  });
+  };
 
-  if (error) {
-    console.error('Resend email error:', error);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('SMTP email error:', error);
     throw new Error('Failed to send OTP email');
   }
 };

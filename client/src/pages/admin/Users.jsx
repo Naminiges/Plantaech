@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../../services';
 import AdminLayout from '../../components/layout/AdminLayout';
-import { RiShieldLine, RiUserLine, RiCheckLine, RiCloseLine } from 'react-icons/ri';
+import { RiShieldLine, RiUserLine, RiCheckLine, RiCloseLine, RiDeleteBin7Line } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 
 export default function AdminUsers() {
@@ -39,6 +39,17 @@ export default function AdminUsers() {
     } catch { toast.error('Failed'); }
   };
 
+  const handleDeleteUser = async (id, name) => {
+    if (!window.confirm(`Are you absolutely sure you want to permanently delete ${name}'s account? This action will completely erase their data and cannot be undone.`)) return;
+    try {
+      await adminService.deleteUser(id);
+      setUsers(u => u.filter(x => x.id !== id));
+      toast.success('User account deleted');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to delete user');
+    }
+  };
+
   return (
     <AdminLayout title="User Management">
       <div className="space-y-4">
@@ -68,6 +79,9 @@ export default function AdminUsers() {
                       </button>
                       <button onClick={()=>toggleBan(u.id,u.is_banned)} className={`btn-ghost btn-sm p-1.5 text-xs ${u.is_banned?'text-green-500':'text-red-400'}`} title={u.is_banned?'Unban':'Ban'}>
                         {u.is_banned?<RiCheckLine/>:<RiCloseLine/>}
+                      </button>
+                      <button onClick={()=>handleDeleteUser(u.id, `${u.first_name} ${u.last_name}`)} className="btn-ghost btn-sm p-1.5 text-xs text-red-500 hover:bg-red-50" title="Delete User">
+                        <RiDeleteBin7Line/>
                       </button>
                     </div>
                   </td>
