@@ -60,4 +60,15 @@ const removeAvatar = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, updateAvatar, removeAvatar };
+// DELETE /api/users/profile
+const deleteProfile = async (req, res, next) => {
+  try {
+    const { error } = await supabase.from('users').delete().eq('id', req.user.id);
+    if (error) throw error;
+    res.json({ message: 'Your account has been deleted successfully.' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { getProfile, updateProfile, updateAvatar, removeAvatar, deleteProfile };

@@ -13,7 +13,7 @@ const generateToken = (userId) =>
   jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
 
-// POST /api/auth/register
+// POST /api/auth/register  →  validate + send OTP (does NOT create user yet)
 const register = async (req, res, next) => {
   try {
     const { first_name, last_name, email, password, phone } = req.body;
@@ -33,16 +33,121 @@ const register = async (req, res, next) => {
     const { data: existing } = await supabase.from('users').select('id').eq('email', email).single();
     if (existing) return res.status(409).json({ error: 'Email already registered' });
 
-    const hashed = await bcrypt.hash(password, 12);
-    const { data: user, error } = await supabase
+    // Hash the password now so we don't store plaintext
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    // Delete any previous pending verification for this email
+    await supabase.from('email_verifications').delete().eq('email', email);
+
+    // Generate 6-digit OTP
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const otpHash = await bcrypt.hash(otp, 10);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+
+    // Store registration data + OTP
+    const { error: insertErr } = await supabase
+      .from('email_verifications')
+      .insert({
+        email,
+        otp_hash: otpHash,
+        registration_data: { first_name, last_name, email, password_hash: passwordHash, phone: phone || null },
+        expires_at: expiresAt,
+      });
+
+    if (insertErr) throw insertErr;
+
+    // Send verification email
+    await sendOtpEmail(email, otp, 'registration');
+
+    res.status(200).json({ message: 'Verification OTP sent to your email.', email });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// POST /api/auth/verify-registration  →  verify OTP + create user
+const verifyRegistration = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required' });
+
+    // Get the latest unexpired verification for this email
+    const { data: record, error } = await supabase
+      .from('email_verifications')
+      .select('*')
+      .eq('email', email)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error || !record) {
+      return res.status(400).json({ error: 'Invalid or expired OTP. Please request a new one.' });
+    }
+
+    const valid = await bcrypt.compare(otp, record.otp_hash);
+    if (!valid) return res.status(400).json({ error: 'Invalid or expired OTP' });
+
+    const rd = record.registration_data;
+
+    // Double-check email isn't taken (race condition guard)
+    const { data: existing } = await supabase.from('users').select('id').eq('email', rd.email).single();
+    if (existing) {
+      await supabase.from('email_verifications').delete().eq('id', record.id);
+      return res.status(409).json({ error: 'Email already registered' });
+    }
+
+    // Create the user
+    const { data: user, error: userErr } = await supabase
       .from('users')
-      .insert({ first_name, last_name, email, password: hashed, phone: phone || null })
+      .insert({ first_name: rd.first_name, last_name: rd.last_name, email: rd.email, password: rd.password_hash, phone: rd.phone })
       .select('id, first_name, last_name, email, phone, role, avatar, created_at')
       .single();
 
-    if (error) throw error;
+    if (userErr) throw userErr;
+
+    // Cleanup verification row
+    await supabase.from('email_verifications').delete().eq('id', record.id);
+
     const token = generateToken(user.id);
     res.status(201).json({ user, token });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// POST /api/auth/resend-registration-otp  →  resend OTP for pending registration
+const resendRegistrationOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    // Check there's a pending verification
+    const { data: record } = await supabase
+      .from('email_verifications')
+      .select('id, registration_data')
+      .eq('email', email)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!record) {
+      return res.status(400).json({ error: 'No pending registration found for this email' });
+    }
+
+    // Generate new OTP and update the row
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const otpHash = await bcrypt.hash(otp, 10);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+
+    await supabase
+      .from('email_verifications')
+      .update({ otp_hash: otpHash, expires_at: expiresAt })
+      .eq('id', record.id);
+
+    await sendOtpEmail(email, otp, 'registration');
+
+    res.json({ message: 'A new OTP has been sent to your email.' });
   } catch (err) {
     next(err);
   }
@@ -86,6 +191,9 @@ const changePassword = async (req, res, next) => {
     if (!current_password || !new_password) {
       return res.status(400).json({ error: 'current_password and new_password are required' });
     }
+    if (current_password === new_password) {
+      return res.status(400).json({ error: 'New password must be different from current password' });
+    }
     if (new_password.length < 8) {
       return res.status(400).json({ error: 'New password must be at least 8 characters' });
     }
@@ -97,7 +205,7 @@ const changePassword = async (req, res, next) => {
       .from('users').select('password').eq('id', req.user.id).single();
 
     const valid = await bcrypt.compare(current_password, user.password);
-    if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
+    if (!valid) return res.status(400).json({ error: 'Current password is incorrect' });
 
     const hashed = await bcrypt.hash(new_password, 12);
     await supabase.from('users').update({ password: hashed }).eq('id', req.user.id);
@@ -142,7 +250,7 @@ const requestOtp = async (req, res, next) => {
 
     if (insertErr) throw insertErr;
 
-    // Send email via Resend
+    // Send email via Gmail SMTP (Nodemailer)
     await sendOtpEmail(email, otp);
 
     res.json(genericMsg);
@@ -232,4 +340,4 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, getMe, changePassword, requestOtp, verifyOtp, resetPassword };
+module.exports = { register, verifyRegistration, resendRegistrationOtp, login, getMe, changePassword, requestOtp, verifyOtp, resetPassword };

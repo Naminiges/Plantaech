@@ -13,6 +13,9 @@ import Community    from './pages/Community';
 import ThreadDetail from './pages/ThreadDetail';
 import NewThread    from './pages/NewThread';
 import Profile      from './pages/Profile';
+import Terms        from './pages/Terms';
+import Privacy      from './pages/Privacy';
+import Contact      from './pages/Contact';
 
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsers     from './pages/admin/Users';
@@ -41,6 +44,9 @@ export default function App() {
           <Route path="/community/:id" element={<ThreadDetail />} />
           <Route path="/diagnosis/result" element={<Diagnosis />} />
           <Route path="/diagnosis/:id" element={<Diagnosis />} />
+          <Route path="/terms"     element={<Terms />} />
+          <Route path="/privacy"   element={<Privacy />} />
+          <Route path="/contact"   element={<Contact />} />
 
           {/* Auth-protected routes */}
           <Route path="/history"       element={<ProtectedRoute><History /></ProtectedRoute>} />
