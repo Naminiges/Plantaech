@@ -2,6 +2,8 @@ import api from './api';
 
 export const authService = {
   register: (data) => api.post('/auth/register', data),
+  verifyRegistration: (data) => api.post('/auth/verify-registration', data),
+  resendRegistrationOtp: (email) => api.post('/auth/resend-registration-otp', { email }),
   login:    (data) => api.post('/auth/login', data),
   getMe:    ()     => api.get('/auth/me'),
   changePassword: (data) => api.put('/auth/password', data),
@@ -19,6 +21,7 @@ export const userService = {
     return api.put('/users/avatar', form);
   },
   removeAvatar: () => api.delete('/users/avatar'),
+  deleteProfile: () => api.delete('/users/profile'),
 };
 
 export const diagnosisService = {
@@ -66,6 +69,7 @@ export const adminService = {
   getUsers:       (params)   => api.get('/admin/users', { params }),
   updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
   banUser:        (id, is_banned) => api.put(`/admin/users/${id}/ban`, { is_banned }),
+  deleteUser:     (id)       => api.delete(`/admin/users/${id}`),
   getPosts:       (params)   => api.get('/admin/posts', { params }),
   pinPost:        (id, is_pinned) => api.put(`/admin/posts/${id}/pin`, { is_pinned }),
   deletePost:     (id)       => api.delete(`/admin/posts/${id}`),

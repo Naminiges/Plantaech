@@ -1,18 +1,41 @@
-const { Resend } = require('resend');
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+const EMAIL_CONTENT = {
+  registration: {
+    subject: 'Verify Your Email — Plantaech',
+    heading: 'Email Verification Code',
+    body: 'Complete your registration by entering the verification code below in the app.',
+  },
+  'password-reset': {
+    subject: 'Your Password Reset Code — Plantaech',
+    heading: 'Password Reset Code',
+    body: 'We received a request to reset your password. Enter the verification code below in the app to continue.',
+  },
+};
 
 /**
- * Send a password-reset OTP email.
- * @param {string} to   – recipient email
- * @param {string} otp  – 6-digit OTP string
+ * Send an OTP email using Brevo (Sendinblue) HTTPS API.
+ * This bypasses Railway's SMTP block.
+ * @param {string} to      – recipient email
+ * @param {string} otp     – 6-digit OTP string
+ * @param {'registration'|'password-reset'} purpose
  */
-const sendOtpEmail = async (to, otp) => {
-  const { error } = await resend.emails.send({
-    from: 'Plantaech <onboarding@resend.dev>',
-    to,
-    subject: 'Your Password Reset Code — Plantaech',
-    html: `
+const sendOtpEmail = async (to, otp, purpose = 'password-reset') => {
+  const content = EMAIL_CONTENT[purpose] || EMAIL_CONTENT['password-reset'];
+
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const smtpUser = process.env.SMTP_USER; // Used as the sender email
+
+  if (!brevoApiKey || !smtpUser) {
+    console.warn('\n' + '='.repeat(60));
+    console.warn('⚠️  BREVO API KEY NOT CONFIGURED');
+    console.warn('Please add BREVO_API_KEY and SMTP_USER to your server/.env file (and Railway).');
+    console.warn(`Recipient: ${to}`);
+    console.warn(`Purpose:   ${purpose}`);
+    console.warn(`OTP CODE:  ${otp}`);
+    console.warn('='.repeat(60) + '\n');
+    return;
+  }
+
+  const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
@@ -30,9 +53,9 @@ const sendOtpEmail = async (to, otp) => {
         <!-- Body -->
         <tr>
           <td style="padding:40px;">
-            <h2 style="margin:0 0 8px;color:#111827;font-size:20px;font-weight:700;">Password Reset Code</h2>
+            <h2 style="margin:0 0 8px;color:#111827;font-size:20px;font-weight:700;">${content.heading}</h2>
             <p style="margin:0 0 28px;color:#6b7280;font-size:14px;line-height:1.6;">
-              We received a request to reset your password. Enter the verification code below in the app to continue.
+              ${content.body}
             </p>
             <!-- OTP box -->
             <div style="background:#f9fafb;border:2px dashed #d1d5db;border-radius:12px;padding:24px;text-align:center;margin-bottom:28px;">
@@ -52,11 +75,39 @@ const sendOtpEmail = async (to, otp) => {
     </td></tr>
   </table>
 </body>
-</html>`,
-  });
+</html>`;
 
-  if (error) {
-    console.error('Resend email error:', error);
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: {
+          name: 'Plantaech',
+          email: smtpUser
+        },
+        to: [
+          {
+            email: to
+          }
+        ],
+        subject: content.subject,
+        htmlContent: htmlContent
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Brevo API error:', errorData);
+      throw new Error(`Failed to send OTP email: ${response.statusText}`);
+    }
+
+  } catch (error) {
+    console.error('Email sending error:', error);
     throw new Error('Failed to send OTP email');
   }
 };

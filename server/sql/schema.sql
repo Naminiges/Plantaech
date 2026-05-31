@@ -149,3 +149,15 @@ CREATE TABLE IF NOT EXISTS password_resets (
 );
 CREATE INDEX IF NOT EXISTS idx_password_resets_email ON password_resets(email);
 
+-- ============================================================
+-- Email Verification OTPs (registration, auto-cleaned after use)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS email_verifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT NOT NULL,
+  otp_hash TEXT NOT NULL,
+  registration_data JSONB NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_email_verifications_email ON email_verifications(email);

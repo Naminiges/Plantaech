@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { userService, authService, forumService } from '../services';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
-import { RiEditLine, RiCloseLine, RiChat1Line, RiFileTextLine, RiListCheck2, RiCameraLine } from 'react-icons/ri';
+import { RiEditLine, RiCloseLine, RiChat1Line, RiFileTextLine, RiListCheck2, RiCameraLine, RiEyeLine, RiEyeOffLine, RiDeleteBin7Line } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') ?? '';
@@ -13,7 +13,7 @@ const avatarSrc = (avatar) => avatar ? (avatar.startsWith('http') ? avatar : `${
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 export default function Profile() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
 
   // Edit modal state
   const [editing,   setEditing]   = useState(false);
@@ -22,6 +22,8 @@ export default function Profile() {
   const [saving,    setSaving]    = useState(false);
   const [pwSaving,  setPwSaving]  = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw,     setShowNewPw]     = useState(false);
   const [avatarConfirm, setAvatarConfirm] = useState('idle'); // 'idle' | 'upload' | 'delete'
   const [pendingFile, setPendingFile] = useState(null);      // file waiting for confirm
   const [pendingPreview, setPendingPreview] = useState(null); // object URL for preview
@@ -113,6 +115,9 @@ export default function Profile() {
   const changePassword = async (e) => {
     e.preventDefault();
     if (!pwForm.current_password) { toast.error('Enter your current password'); return; }
+    if (pwForm.current_password === pwForm.new_password) {
+      toast.error('New password must be different from current password'); return;
+    }
     if (!PASSWORD_REGEX.test(pwForm.new_password)) {
       toast.error('New password must be min 8 chars, 1 uppercase, 1 number'); return;
     }
@@ -120,10 +125,24 @@ export default function Profile() {
     setPwSaving(true);
     try {
       await authService.changePassword({ current_password: pwForm.current_password, new_password: pwForm.new_password });
-      toast.success('Password changed!');
+      toast.success('Password changed successfully! Logging out...');
       setPwForm({ current_password: '', new_password: '', confirm: '' });
+      setTimeout(() => {
+        logout();
+      }, 1500);
     } catch (err) { toast.error(err.response?.data?.error || 'Failed to change password'); }
     finally { setPwSaving(false); }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Are you absolutely sure you want to permanently delete your account? All your posts, comments, and reports will be deleted, and you will be logged out. This action cannot be undone.')) return;
+    try {
+      await userService.deleteProfile();
+      toast.success('Your account has been successfully deleted.');
+      logout();
+    } catch {
+      toast.error('Failed to delete account');
+    }
   };
 
   // Determine display state for each item:
@@ -308,24 +327,52 @@ export default function Profile() {
               <form onSubmit={changePassword} className="space-y-4">
                 <p className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-4">Change Password</p>
                 <div><label className="form-label">Current Password</label>
-                  <input type="password" className="form-input" value={pwForm.current_password}
-                    onChange={e => setPwForm(f => ({...f, current_password: e.target.value}))} />
+                  <div className="relative">
+                    <input type={showCurrentPw ? 'text' : 'password'} className="form-input pr-10" value={pwForm.current_password}
+                      onChange={e => setPwForm(f => ({...f, current_password: e.target.value}))} />
+                    <button type="button" tabIndex={-1} onClick={() => setShowCurrentPw(!showCurrentPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-accent transition-colors">
+                      {showCurrentPw ? <RiEyeOffLine /> : <RiEyeLine />}
+                    </button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div><label className="form-label">New Password</label>
-                    <input type="password" className="form-input" value={pwForm.new_password}
-                      onChange={e => setPwForm(f => ({...f, new_password: e.target.value}))} />
+                    <div className="relative">
+                      <input type={showNewPw ? 'text' : 'password'} className="form-input pr-10" value={pwForm.new_password}
+                        onChange={e => setPwForm(f => ({...f, new_password: e.target.value}))} />
+                      <button type="button" tabIndex={-1} onClick={() => setShowNewPw(!showNewPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-accent transition-colors">
+                        {showNewPw ? <RiEyeOffLine /> : <RiEyeLine />}
+                      </button>
+                    </div>
                     <p className="text-xs text-gray-400 mt-1">Min 8 chars, 1 uppercase, 1 number</p>
                   </div>
                   <div><label className="form-label">Confirm New Password</label>
-                    <input type="password" className="form-input" value={pwForm.confirm}
-                      onChange={e => setPwForm(f => ({...f, confirm: e.target.value}))} />
+                    <div className="relative">
+                      <input type={showNewPw ? 'text' : 'password'} className="form-input pr-10" value={pwForm.confirm}
+                        onChange={e => setPwForm(f => ({...f, confirm: e.target.value}))} />
+                      <button type="button" tabIndex={-1} onClick={() => setShowNewPw(!showNewPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-accent transition-colors">
+                        {showNewPw ? <RiEyeOffLine /> : <RiEyeLine />}
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <button type="submit" disabled={pwSaving} className="btn-outline rounded-full px-6 py-2 text-sm font-medium disabled:opacity-50 hover:border-brand-accent hover:text-brand-accent">
                   {pwSaving ? 'Changing…' : 'Change Password'}
                 </button>
               </form>
+
+              {/* ─ Danger Zone ─ */}
+              <div className="pt-6 border-t border-red-100 mt-6 space-y-3">
+                <p className="text-red-500 text-xs font-bold uppercase tracking-widest flex items-center gap-1.5">
+                  <RiDeleteBin7Line className="text-sm" /> Danger Zone
+                </p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Once you delete your account, all of your forum posts, comments, and reports will be permanently deleted, and your diagnostic history will be anonymized. This action is irreversible.
+                </p>
+                <button type="button" onClick={handleDeleteAccount} className="btn-outline border-red-200 text-red-500 hover:bg-red-50 hover:border-red-500 rounded-full px-5 py-2 text-sm font-semibold transition-colors">
+                  Delete Account
+                </button>
+              </div>
             </div>
           )}
 

@@ -33,11 +33,10 @@ export const AuthProvider = ({ children }) => {
 
   const register = useCallback(async (formData) => {
     const { data } = await authService.register(formData);
-    localStorage.setItem('plantaech_token', data.token);
-    localStorage.setItem('plantaech_user', JSON.stringify(data.user));
-    setUser(data.user);
-    return data.user;
+    return data; // { message, email } — no token yet
   }, []);
+
+
 
   const logout = useCallback(() => {
     localStorage.removeItem('plantaech_token');

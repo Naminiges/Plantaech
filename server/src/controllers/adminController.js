@@ -200,4 +200,22 @@ const deleteDisease = async (req, res, next) => {
   }
 };
 
-module.exports = { getStats, getUsers, updateUserRole, banUser, getPosts, pinPost, deletePost, getDiseases, createDisease, updateDisease, deleteDisease };
+// DELETE /api/admin/users/:id
+const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Prevent an admin from deleting themselves
+    if (id === req.user.id) {
+      return res.status(400).json({ error: 'You cannot delete your own admin account from here.' });
+    }
+
+    const { error } = await supabase.from('users').delete().eq('id', id);
+    if (error) throw error;
+    res.json({ message: 'User account successfully deleted.' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { getStats, getUsers, updateUserRole, banUser, deleteUser, getPosts, pinPost, deletePost, getDiseases, createDisease, updateDisease, deleteDisease };

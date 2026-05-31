@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getProfile, updateProfile, updateAvatar, removeAvatar } = require('../controllers/userController');
+const { getProfile, updateProfile, updateAvatar, removeAvatar, deleteProfile } = require('../controllers/userController');
 const { requireAuth } = require('../middleware/auth');
 const { uploadAvatar } = require('../middleware/upload');
 
@@ -13,5 +13,6 @@ router.put('/avatar', requireAuth, (req, res, next) => {
   });
 }, updateAvatar);
 router.delete('/avatar', requireAuth, removeAvatar);
+router.delete('/profile', requireAuth, deleteProfile);
 
 module.exports = router;
