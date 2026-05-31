@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 
-# ======================== KONFIGURASI ========================
+# KONFIGURASI
 st.set_page_config(
     page_title="Plantaech Dashboard - Analisis Penyakit Tanaman Tomat",
     page_icon="🌿",
@@ -21,7 +21,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ======================== LOAD DATA ========================
+# LOAD DATA
 @st.cache_data
 def load_data():
     """Memuat data dari file CSV."""
@@ -35,7 +35,7 @@ def load_data():
 
 df = load_data()
 
-# ======================== SIDEBAR ========================
+# SIDEBAR
 st.sidebar.title("🌿 Plantaech Dashboard")
 st.sidebar.markdown("---")
 
@@ -80,7 +80,7 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("**Tim:** CC26-PSU258")
 st.sidebar.markdown("**Tema:** Sustainable Living")
 
-# ======================== HEADER ========================
+# HEADER
 st.title("🌿 Plantaech - Dashboard Analisis Penyakit Tanaman Tomat")
 st.markdown("""
 Dashboard interaktif ini menampilkan hasil analisis dataset penyakit tanaman tomat 
@@ -88,7 +88,7 @@ yang digunakan dalam proyek **Plantaech** - solusi berbasis AI untuk membantu pe
 mengidentifikasi penyakit tanaman secara dini.
 """)
 
-# ======================== METRIC CARDS ========================
+# METRIC CARDS
 st.markdown("### 📊 Ringkasan Dataset")
 col1, col2, col3, col4, col5 = st.columns(5)
 
@@ -108,7 +108,7 @@ with col5:
 
 st.markdown("---")
 
-# ======================== TAB LAYOUT ========================
+# TAB LAYOUT
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📈 Distribusi Kelas", 
     "🔍 Analisis Gambar",
@@ -117,7 +117,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📝 Kesimpulan & Rekomendasi"
 ])
 
-# ======================== TAB 1: DISTRIBUSI KELAS ========================
+# TAB 1: DISTRIBUSI KELAS
 with tab1:
     st.markdown("### Pertanyaan Bisnis 1")
     st.info("""
@@ -146,10 +146,34 @@ with tab1:
         st.pyplot(fig)
     
     with col_right:
-        # Menghapus Pie Chart karena kategori yang banyak membuat distraksi dan ink-ratio rendah
-        # Digantikan dengan representasi tabel di bawah
-        st.markdown("#### Informasi Proporsi Kelas")
-        st.info("Penyakit " + class_counts.index[0] + " mendominasi dataset dengan " + str(class_counts.values[0]) + " sampel.")
+        # Donut chart untuk top 5 + Others
+        fig_pie, ax_pie = plt.subplots(figsize=(8, 6))
+        top_n = 5
+        if len(class_counts) > top_n:
+            top_classes = class_counts.head(top_n)
+            others_sum = class_counts.iloc[top_n:].sum()
+            pie_data = pd.concat([top_classes, pd.Series({'Others': others_sum})])
+        else:
+            pie_data = class_counts
+        
+        # Harmonious colors
+        colors_pie = sns.color_palette("pastel", len(pie_data))
+        wedges, texts, autotexts = ax_pie.pie(
+            pie_data.values, 
+            labels=pie_data.index, 
+            autopct='%1.1f%%', 
+            startangle=90, 
+            colors=colors_pie,
+            textprops=dict(color="black", fontsize=9),
+            pctdistance=0.75
+        )
+        # Donut hole
+        centre_circle = plt.Circle((0,0), 0.55, fc='white')
+        ax_pie.add_artist(centre_circle)
+        ax_pie.set_title('Proporsi Top 5 Kelas & Others', fontsize=14, fontweight='bold')
+        plt.tight_layout()
+        st.pyplot(fig_pie)
+        plt.close(fig_pie)
     
     # Tabel distribusi
     st.markdown("#### Tabel Distribusi Kelas")
@@ -167,7 +191,7 @@ with tab1:
     - Kelas dengan sampel sedikit memerlukan teknik augmentasi data untuk meningkatkan performa model
     """)
 
-# ======================== TAB 2: ANALISIS GAMBAR ========================
+# TAB 2: ANALISIS GAMBAR
 with tab2:
     st.markdown("### Pertanyaan Bisnis 2")
     st.info("""
@@ -188,6 +212,7 @@ with tab2:
         plt.suptitle('')
         plt.tight_layout()
         st.pyplot(fig3)
+        plt.close(fig3)
     
     with col_b:
         # Distribusi resolusi
@@ -200,6 +225,7 @@ with tab2:
         ax4.set_title('Rata-rata Resolusi per Kelas', fontsize=14, fontweight='bold')
         plt.tight_layout()
         st.pyplot(fig4)
+        plt.close(fig4)
     
     # Statistik deskriptif
     st.markdown("#### Statistik Deskriptif Kualitas Gambar")
@@ -210,39 +236,43 @@ with tab2:
     }).round(2)
     st.dataframe(stats_df, use_container_width=True)
 
-# ======================== TAB 3: SEHAT VS SAKIT ========================
+# TAB 3: SEHAT VS SAKIT
 with tab3:
     st.markdown("### Perbandingan Tanaman Sehat vs Sakit")
     
     col_x, col_y = st.columns(2)
     
     with col_x:
-        # Perbandingan jumlah
+         # Perbandingan jumlah
         fig5, ax5 = plt.subplots(figsize=(8, 5))
         cond_counts = filtered_df['condition'].value_counts()
-        colors5 = ['#2ecc71', '#e74c3c']
+        color_map = {'Healthy': '#2ecc71', 'Diseased': '#e74c3c', 'Non Tomato': '#95a5a6'}
+        colors5 = [color_map.get(cond, '#95a5a6') for cond in cond_counts.index]
         ax5.bar(cond_counts.index, cond_counts.values, color=colors5)
-        ax5.set_title('Jumlah Gambar: Sehat vs Sakit', fontsize=14, fontweight='bold')
+        ax5.set_title('Jumlah Gambar: Sehat vs Sakit vs Non Tomato', fontsize=14, fontweight='bold')
         ax5.set_ylabel('Jumlah', fontsize=12)
         for i, v in enumerate(cond_counts.values):
             ax5.text(i, v + 50, f'{v:,}', ha='center', fontsize=12, fontweight='bold')
         plt.tight_layout()
         st.pyplot(fig5)
+        plt.close(fig5)
     
     with col_y:
         # Perbandingan ukuran file
         fig6, ax6 = plt.subplots(figsize=(8, 5))
-        for cond, color in zip(['Healthy', 'Diseased'], colors5):
+        for cond in ['Healthy', 'Diseased', 'Non Tomato']:
+            color = color_map[cond]
             subset = filtered_df[filtered_df['condition'] == cond]
             if not subset.empty:
                 ax6.hist(subset['file_size_kb'], bins=30, alpha=0.6, 
                         label=cond, color=color, density=True)
-        ax6.set_title('Distribusi Ukuran File: Sehat vs Sakit', fontsize=14, fontweight='bold')
+        ax6.set_title('Distribusi Ukuran File: Sehat, Sakit & Non Tomato', fontsize=14, fontweight='bold')
         ax6.set_xlabel('Ukuran File (KB)', fontsize=12)
         ax6.set_ylabel('Densitas', fontsize=12)
         ax6.legend()
         plt.tight_layout()
         st.pyplot(fig6)
+        plt.close(fig6)
     
     # Ringkasan statistik
     st.markdown("#### Perbandingan Statistik")
@@ -253,7 +283,7 @@ with tab3:
     }).round(2)
     st.dataframe(comparison, use_container_width=True)
 
-# ======================== TAB 4: A/B TESTING ========================
+# TAB 4: A/B TESTING
 with tab4:
     st.markdown("### 🧪 A/B Testing: Perbandingan Kualitas Gambar")
     st.markdown("""
@@ -267,8 +297,8 @@ with tab4:
     - **Significance Level (α):** 0.05
     """)
     
-    healthy_data = filtered_df[filtered_df['is_healthy'] == True]['file_size_kb']
-    diseased_data = filtered_df[filtered_df['is_healthy'] == False]['file_size_kb']
+healthy_data = filtered_df[filtered_df['condition'] == 'Healthy']['file_size_kb']
+    diseased_data = filtered_df[filtered_df['condition'] == 'Diseased']['file_size_kb']
     
     if len(healthy_data) > 0 and len(diseased_data) > 0:
         # Lakukan t-test
@@ -310,7 +340,8 @@ with tab4:
         
         plt.tight_layout()
         st.pyplot(fig7)
-        
+        plt.close(fig7)
+
         # Interpretasi
         st.markdown("#### Interpretasi Hasil")
         if p_value < 0.05:
@@ -337,7 +368,7 @@ with tab4:
     else:
         st.warning("Data tidak cukup untuk melakukan A/B Testing. Pastikan filter menyertakan kedua kondisi.")
 
-# ======================== TAB 5: KESIMPULAN ========================
+# KESIMPULAN 
 with tab5:
     st.markdown("### 📝 Kesimpulan & Rekomendasi")
     
@@ -352,7 +383,7 @@ with tab5:
     st.markdown(f"""
     **Kesimpulan Pertanyaan Bisnis 1:**
     - Dataset Plantaech terdiri dari **{len(df):,} gambar** yang terbagi ke dalam 
-      **{df['class_name'].nunique()} kelas** (9 penyakit + 1 sehat)
+       **{df['class_name'].nunique()} kelas** (9 penyakit + 1 sehat + 1 Non Tomato)
     - Penyakit paling dominan adalah **{most_common}** dengan **{most_common_count:,} sampel** 
       ({most_common_count/len(df)*100:.1f}% dari total)
     - Penyakit paling jarang adalah **{least_common}** dengan **{least_common_count:,} sampel** 
@@ -390,7 +421,7 @@ with tab5:
        jumlah data yang tersedia
     """)
 
-# ======================== FOOTER ========================
+# FOOTER
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: gray;'>

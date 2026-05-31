@@ -15,11 +15,11 @@ Proyek ini merupakan bagian dari Capstone Project **Coding Camp 2026 powered by 
 | Kolom | Tipe | Deskripsi |
 |-------|------|-----------|
 | filename | string | Nama file gambar |
-| filepath | string | Path lengkap ke file gambar |
+| file_extension | string | Ekstensi file gambar (.jpg, .png, dll) |
 | class_name | string | Nama kelas/kategori (nama folder dataset) |
 | disease_name | string | Nama penyakit yang sudah diformat |
 | is_healthy | boolean | True jika tanaman sehat, False jika sakit |
-| condition | string | Kategori kondisi: 'Healthy' atau 'Diseased' |
+| condition | string | Kategori kondisi: 'Healthy', 'Diseased', atau 'Non Tomato' |
 | width | integer | Lebar gambar dalam pixel |
 | height | integer | Tinggi gambar dalam pixel |
 | aspect_ratio | float | Rasio aspek gambar (width/height) |
@@ -27,10 +27,12 @@ Proyek ini merupakan bagian dari Capstone Project **Coding Camp 2026 powered by 
 | file_size_bytes | integer | Ukuran file dalam bytes |
 | file_size_kb | float | Ukuran file dalam kilobytes |
 | color_mode | string | Mode warna gambar (RGB, L, dll.) |
-| file_format | string | Format file gambar |
-| class_proportion | float | Proporsi kelas terhadap total dataset (%) |
-| file_size_category | string | Kategori ukuran file |
-| resolution_category | string | Kategori resolusi gambar |
+| file_format | string | Format file gambar (JPEG, PNG, dll) |
+| file_size_category | string | Kategori ukuran file (Very Small, Small, Medium, Large, Very Large) |
+| resolution_category | string | Kategori resolusi gambar (Low, Medium, High) |
+| file_hash | string | Hash MD5 untuk identifikasi file duplikat |
+| is_valid_image_ext | boolean | True jika ekstensi file valid |
+| is_corrupt | boolean | True jika file gambar corrupt/tidak bisa dibuka |
 
 ## Struktur Direktori
 
@@ -106,9 +108,11 @@ Plantaech/
 │   └── package.json
 ├── dashboard/
 │   ├── main_data.csv               # Dataset metadata yang sudah diolah
-│   ├── prepare_data.py             # Script persiapan data
+│   ├── model_features.csv          # Fitur model yang sudah di-encode, tanpa kolom target/metadata
+│   ├── model_labels.csv            # Label model (disease_name, is_healthy, condition)
 │   └── dashboard.py                # Script dashboard Streamlit
 ├── dataset/
+│   ├── Non_tomato/                # 1,666 gambar
 │   ├── Tomato_Bacterial_spot/      # 2,127 gambar
 │   ├── Tomato_Early_blight/        # 1,000 gambar
 │   ├── Tomato_Late_blight/         # 1,909 gambar
@@ -158,7 +162,7 @@ Buka file `notebook.ipynb` menggunakan Jupyter Notebook atau Google Colab, lalu 
 jupyter notebook notebook.ipynb
 ```
 
-> **Catatan:** Pastikan untuk menjalankan seluruh cell di notebook terlebih dahulu agar file `dashboard/main_data.csv` ter-generate.
+> **Catatan:** Pastikan untuk menjalankan seluruh cell di notebook terlebih dahulu agar file `dashboard/main_data.csv`, `dashboard/model_features.csv`, dan `dashboard/model_labels.csv` ter-generate.
 
 ## Menjalankan Dashboard
 
