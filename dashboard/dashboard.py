@@ -297,7 +297,7 @@ with tab4:
     - **Significance Level (α):** 0.05
     """)
     
-healthy_data = filtered_df[filtered_df['condition'] == 'Healthy']['file_size_kb']
+    healthy_data = filtered_df[filtered_df['condition'] == 'Healthy']['file_size_kb']
     diseased_data = filtered_df[filtered_df['condition'] == 'Diseased']['file_size_kb']
     
     if len(healthy_data) > 0 and len(diseased_data) > 0:
