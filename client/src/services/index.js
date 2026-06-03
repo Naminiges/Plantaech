@@ -81,3 +81,7 @@ export const adminService = {
   updateDisease:  (id, data) => api.put(`/admin/diseases/${id}`, data),
   deleteDisease:  (id)       => api.delete(`/admin/diseases/${id}`),
 };
+
+export const miscService = {
+  sendContact: (data) => api.post('/misc/contact', data),
+};
