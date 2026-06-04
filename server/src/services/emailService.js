@@ -112,4 +112,76 @@ const sendOtpEmail = async (to, otp, purpose = 'password-reset') => {
   }
 };
 
-module.exports = { sendOtpEmail };
+/**
+ * Send a contact form email using Brevo (Sendinblue) HTTPS API.
+ * @param {string} name      – sender name
+ * @param {string} email     – sender email
+ * @param {string} subject   – subject
+ * @param {string} message   – message content
+ */
+const sendContactEmail = async (name, email, subject, message) => {
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const smtpUser = process.env.SMTP_USER; // Used as the recipient
+
+  if (!brevoApiKey || !smtpUser) {
+    console.warn('⚠️ BREVO API KEY NOT CONFIGURED for Contact Form');
+    return;
+  }
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="font-family:sans-serif;background:#f9fafb;padding:40px;">
+  <div style="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+    <h2 style="color:#111827;margin-top:0;">New Contact Request 🌿</h2>
+    <p style="color:#6b7280;margin-bottom:20px;">You received a new message from the Plantaech contact form.</p>
+    
+    <div style="background:#f3f4f6;padding:20px;border-radius:12px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;"><strong>Name:</strong> ${name}</p>
+      <p style="margin:0 0 8px;"><strong>Email:</strong> ${email}</p>
+      <p style="margin:0 0 8px;"><strong>Subject:</strong> ${subject}</p>
+    </div>
+    
+    <div style="border-left:4px solid #15803d;padding-left:16px;color:#111827;line-height:1.6;">
+      ${message.replace(/\n/g, '<br/>')}
+    </div>
+  </div>
+</body>
+</html>`;
+
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: {
+          name: name,
+          email: email
+        },
+        to: [
+          {
+            email: smtpUser
+          }
+        ],
+        subject: `[Plantaech Contact] ${subject}`,
+        htmlContent: htmlContent
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Brevo API Contact error:', errorData);
+      throw new Error(`Failed to send Contact email: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Contact email sending error:', error);
+    throw new Error('Failed to send Contact email');
+  }
+};
+
+module.exports = { sendOtpEmail, sendContactEmail };

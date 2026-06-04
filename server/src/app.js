@@ -11,6 +11,7 @@ const forumRoutes = require('./routes/forum');
 const reportRoutes = require('./routes/reports');
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/users');
+const miscRoutes = require('./routes/misc');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/misc', miscRoutes);
 
 // ── Health Check ───────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));

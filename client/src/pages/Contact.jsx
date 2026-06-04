@@ -3,24 +3,29 @@ import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import { RiShieldKeyholeLine, RiChat1Line, RiShieldLine, RiEditLine } from 'react-icons/ri';
 import toast from 'react-hot-toast';
+import { miscService } from '../services';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.subject || !form.message) {
       toast.error('Please fill out all fields');
       return;
     }
     setLoading(true);
-    // Simulate API request
-    setTimeout(() => {
+    
+    try {
+      await miscService.sendContact(form);
       toast.success('Message sent successfully! We will get back to you soon.');
       setForm({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to send message.');
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -49,7 +54,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-brand-accent uppercase tracking-wider mb-0.5">Email Support</p>
-                    <a href="mailto:support@plantaech.com" className="text-sm font-medium text-brand-secondary hover:text-brand-accent transition-colors">support@plantaech.com</a>
+                    <a href="mailto:fathur.6913@gmail.com" className="text-sm font-medium text-brand-secondary hover:text-brand-accent transition-colors">fathur.6913@gmail.com</a>
                   </div>
                 </div>
 
@@ -60,7 +65,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-brand-accent uppercase tracking-wider mb-0.5">Hotline</p>
-                    <p className="text-sm font-medium text-brand-secondary">+62 821-4567-890</p>
+                    <p className="text-sm font-medium text-brand-secondary">+62 813-9675-7694</p>
                   </div>
                 </div>
 
@@ -72,8 +77,7 @@ export default function Contact() {
                   <div>
                     <p className="text-xs font-bold text-brand-accent uppercase tracking-wider mb-0.5">Location</p>
                     <p className="text-sm font-medium text-brand-secondary leading-relaxed">
-                      Agricultural Tech Hub<br />
-                      Bandung, West Java, Indonesia
+                      Medan, Sumatera Utara, Indonesia
                     </p>
                   </div>
                 </div>
