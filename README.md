@@ -46,29 +46,35 @@ Plantaech/
 │   │   │   │   ├── Navbar.jsx          # Navigasi utama & menu admin
 │   │   │   │   ├── Footer.jsx          # Footer global
 │   │   │   │   └── AdminLayout.jsx     # Wrapper halaman admin
-│   │   │   └── ui/
-│   │   │       ├── ReportModal.jsx     # Modal laporan konten
-│   │   │       └── UploadArea.jsx      # Drag-and-drop upload gambar
+│   │   │   ├── ui/
+│   │   │   │   ├── ReportModal.jsx     # Modal laporan konten
+│   │   │   │   └── UploadArea.jsx      # Drag-and-drop upload gambar
+│   │   │   └── ProtectedRoute.jsx      # Guard route: ProtectedRoute & AdminRoute
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx         # State autentikasi global
 │   │   ├── pages/
 │   │   │   ├── Landing.jsx             # Beranda
 │   │   │   ├── Login.jsx               # Halaman masuk
-│   │   │   ├── Register.jsx            # Daftar akun baru
+│   │   │   ├── Register.jsx            # Daftar akun baru (+ verifikasi OTP)
+│   │   │   ├── ForgotPassword.jsx      # Alur lupa password (minta, verifikasi OTP, reset)
 │   │   │   ├── Diagnosis.jsx           # Upload & diagnosa AI
 │   │   │   ├── History.jsx             # Riwayat diagnosa
 │   │   │   ├── Community.jsx           # Daftar thread forum
 │   │   │   ├── NewThread.jsx           # Form buat thread baru
 │   │   │   ├── ThreadDetail.jsx        # Detail thread & komentar
 │   │   │   ├── Profile.jsx             # Profil & feed aktivitas pengguna
+│   │   │   ├── Terms.jsx               # Halaman syarat & ketentuan
+│   │   │   ├── Privacy.jsx             # Halaman kebijakan privasi
+│   │   │   ├── Contact.jsx             # Halaman kontak + form kirim pesan
 │   │   │   └── admin/
 │   │   │       ├── Dashboard.jsx       # Statistik admin
-│   │   │       ├── Users.jsx           # Manajemen pengguna
+│   │   │       ├── Users.jsx           # Manajemen pengguna (ban, delete, role)
 │   │   │       ├── Posts.jsx           # Manajemen postingan
-│   │   │       └── Reports.jsx         # Moderasi laporan
+│   │   │       ├── Reports.jsx         # Moderasi laporan
+│   │   │       └── Diseases.jsx        # Manajemen data penyakit (CRUD)
 │   │   ├── services/
 │   │   │   ├── api.js                  # Fetch wrapper (base URL, token, error)
-│   │   │   └── index.js                # Semua service (auth, user, forum, dll)
+│   │   │   └── index.js                # Semua service (auth, user, forum, misc, dll)
 │   │   ├── utils/
 │   │   │   └── exportPdf.js            # Ekspor laporan diagnosis ke PDF
 │   │   ├── App.jsx                     # Routing utama
@@ -85,22 +91,29 @@ Plantaech/
 │   │   ├── config/
 │   │   │   └── supabase.js             # Klien Supabase (Service Role Key)
 │   │   ├── controllers/
-│   │   │   ├── authController.js       # Register, login, ganti password
-│   │   │   ├── userController.js       # Profil & avatar
+│   │   │   ├── authController.js       # Register (OTP), login, ganti password, reset password
+│   │   │   ├── userController.js       # Profil, avatar, hapus akun
 │   │   │   ├── diagnosisController.js  # Upload & analisa AI
 │   │   │   ├── forumController.js      # Thread, komentar, aktivitas pengguna
 │   │   │   ├── reportController.js     # Laporan konten
-│   │   │   └── adminController.js      # Panel admin
+│   │   │   └── adminController.js      # Panel admin (user, post, penyakit)
 │   │   ├── middleware/
-│   │   │   ├── auth.js                 # Verifikasi JWT
-│   │   │   ├── admin.js                # Cek role admin
+│   │   │   ├── auth.js                 # Verifikasi JWT (requireAuth, optionalAuth)
+│   │   │   ├── admin.js                # Cek role admin (requireAdmin)
 │   │   │   ├── upload.js               # Multer (plant, avatar, thread image)
 │   │   │   └── errorHandler.js         # Global error handler
 │   │   ├── routes/
-│   │   │   ├── auth.js, users.js, diagnoses.js
-│   │   │   ├── forum.js, reports.js, admin.js
+│   │   │   ├── auth.js                 # Endpoint autentikasi & OTP
+│   │   │   ├── users.js                # Endpoint profil pengguna
+│   │   │   ├── diagnoses.js            # Endpoint diagnosa
+│   │   │   ├── forum.js                # Endpoint forum
+│   │   │   ├── reports.js              # Endpoint laporan
+│   │   │   ├── admin.js                # Endpoint admin
+│   │   │   └── misc.js                 # Endpoint publik (form kontak)
 │   │   ├── services/
-│   │   │   └── aiService.js            # Integrasi endpoint model AI
+│   │   │   ├── aiService.js            # Integrasi endpoint model AI + disease cache
+│   │   │   ├── emailService.js         # Kirim OTP & form kontak via Brevo API
+│   │   │   └── storage.js              # Upload & hapus file di Supabase Storage
 │   │   └── app.js                      # Entry point Express
 │   ├── .env
 │   ├── .env.example
@@ -207,8 +220,9 @@ Plantaech memiliki aplikasi web full-stack yang dibangun dengan **Express.js** (
 
 ### Prasyarat
 
-- Node.js v18 atau lebih baru
+- Node.js **v20** atau lebih baru (diwajibkan oleh `server/package.json`)
 - Akun [Supabase](https://supabase.com) dengan project yang sudah dibuat
+- Akun [Brevo](https://www.brevo.com) untuk layanan email OTP (gratis, 300 email/hari)
 
 ---
 
@@ -234,7 +248,7 @@ Isi file `server/.env`:
 ```env
 PORT=5000
 NODE_ENV=development
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=http://localhost:5173  # Wajib diisi URL frontend di production
 
 # Supabase — Settings > API di dashboard Supabase
 SUPABASE_URL=https://xxx.supabase.co
@@ -248,11 +262,20 @@ JWT_EXPIRES_IN=7d
 
 # AI Model
 AI_MODEL_API_URL=https://plantaech-ai-model-production.up.railway.app/predict
+
+# Email — Brevo API (menggantikan SMTP tradisional yang diblokir di Railway)
+SMTP_USER=youremail@gmail.com    # Alamat pengirim yang terdaftar di Brevo
+BREVO_API_KEY=xkeysib-...        # API Key dari dashboard Brevo (tab "API Keys")
+
+# File Upload
+MAX_FILE_SIZE=10485760           # Batas ukuran file diagnosis (bytes), default 10MB
 ```
 
 **Supabase Storage buckets**
-- `SUPABASE_PUBLIC_BUCKET` dipakai untuk avatar dan gambar thread (public bucket).
-- `SUPABASE_DIAGNOSIS_BUCKET` dipakai untuk gambar diagnosis. Jika ingin private, set bucket ini sebagai private di Supabase. Jika ingin public, gunakan bucket public yang sama.
+- `SUPABASE_PUBLIC_BUCKET` dipakai untuk avatar dan gambar thread — buat sebagai **public bucket** di Supabase Dashboard.
+- `SUPABASE_DIAGNOSIS_BUCKET` dipakai untuk gambar diagnosis — buat sebagai **private bucket** jika ingin URL aman, atau public jika tidak.
+
+> ⚠️ Pastikan kedua bucket dibuat terlebih dahulu di **Supabase Dashboard → Storage** sebelum menjalankan aplikasi.
 
 #### c. Setup database
 
@@ -322,10 +345,15 @@ Aplikasi berjalan di `http://localhost:5173`.
 
 | Method | Endpoint | Auth | Keterangan |
 |--------|----------|------|------------|
-| POST | `/api/auth/register` | Tidak | Daftar akun baru |
+| POST | `/api/auth/register` | Tidak | Daftar akun — mengirimkan OTP ke email |
+| POST | `/api/auth/verify-registration` | Tidak | Verifikasi OTP registrasi untuk aktivasi akun |
+| POST | `/api/auth/resend-registration-otp` | Tidak | Kirim ulang OTP registrasi |
 | POST | `/api/auth/login` | Tidak | Masuk, mengembalikan JWT |
 | GET | `/api/auth/me` | Ya | Data pengguna yang sedang login |
-| PUT | `/api/auth/password` | Ya | Ganti password |
+| PUT | `/api/auth/password` | Ya | Ganti password (cek kesamaan password lama & baru) |
+| POST | `/api/auth/forgot-password` | Tidak | Minta OTP untuk reset password |
+| POST | `/api/auth/verify-otp` | Tidak | Verifikasi OTP reset password |
+| POST | `/api/auth/reset-password` | Tidak | Reset password baru dengan OTP terverifikasi |
 
 #### Pengguna
 
@@ -335,6 +363,7 @@ Aplikasi berjalan di `http://localhost:5173`.
 | PUT | `/api/users/profile` | Ya | Update profil (nama, nomor HP) |
 | PUT | `/api/users/avatar` | Ya | Ganti foto profil |
 | DELETE | `/api/users/avatar` | Ya | Hapus foto profil |
+| DELETE | `/api/users/profile` | Ya | Hapus akun sendiri (CASCADE ke semua data terkait) |
 
 #### Diagnosa
 
@@ -376,9 +405,25 @@ Aplikasi berjalan di `http://localhost:5173`.
 | GET | `/api/admin/users` | Ya (Admin) | Daftar pengguna |
 | PUT | `/api/admin/users/:id/role` | Ya (Admin) | Ubah role pengguna |
 | PUT | `/api/admin/users/:id/ban` | Ya (Admin) | Ban/unban pengguna |
+| DELETE | `/api/admin/users/:id` | Ya (Admin) | Hapus akun pengguna (tidak bisa hapus diri sendiri) |
 | GET | `/api/admin/posts` | Ya (Admin) | Daftar semua thread |
 | PUT | `/api/admin/posts/:id/pin` | Ya (Admin) | Pin/unpin thread |
 | DELETE | `/api/admin/posts/:id` | Ya (Admin) | Hapus thread |
+
+#### Penyakit (Knowledge Base)
+
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|------|------------|
+| GET | `/api/admin/diseases` | Ya (Admin) | Daftar seluruh data penyakit |
+| POST | `/api/admin/diseases` | Ya (Admin) | Tambah data penyakit baru |
+| PUT | `/api/admin/diseases/:id` | Ya (Admin) | Edit data penyakit (juga membersihkan cache AI) |
+| DELETE | `/api/admin/diseases/:id` | Ya (Admin) | Hapus data penyakit |
+
+#### Lain-lain
+
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|------|------------|
+| POST | `/api/misc/contact` | Tidak | Kirim pesan dari form kontak ke email admin via Brevo |
 
 ---
 
@@ -406,11 +451,54 @@ Pastikan `AI_MODEL_API_URL` di `.env` backend diatur mengarah ke URL public API 
 
 ### 5. Deploy ke Railway
 
-1. Push repo ke GitHub
-2. Buat project baru di Railway → **Deploy from GitHub**
-3. Tambahkan service → set **Root Directory** ke `server`
-4. Tambahkan semua environment variable dari `.env` di dashboard Railway
-5. Untuk frontend: update `VITE_API_URL` ke URL backend Railway, lalu jalankan `npm run build` di dalam `client/`
+#### a. Install Railway CLI
+
+```bash
+npm install -g @railway/cli
+railway login
+railway link   # pilih project kamu
+```
+
+#### b. Deploy Backend
+
+```bash
+cd server
+railway up
+```
+
+#### c. Deploy Frontend
+
+```bash
+cd client
+railway up
+```
+
+#### d. Environment Variables di Railway Dashboard
+
+Tambahkan variabel berikut di **Railway Dashboard → service backend → Variables**:
+
+| Variabel | Keterangan |
+|----------|------------|
+| `NODE_ENV` | `production` |
+| `CLIENT_URL` | URL public frontend Railway |
+| `SUPABASE_URL` | URL project Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Secret key Supabase |
+| `SUPABASE_PUBLIC_BUCKET` | `public-images` |
+| `SUPABASE_DIAGNOSIS_BUCKET` | `diagnosis-images` |
+| `JWT_SECRET` | String rahasia panjang |
+| `JWT_EXPIRES_IN` | `7d` |
+| `AI_MODEL_API_URL` | URL endpoint FastAPI model AI |
+| `SMTP_USER` | Email pengirim yang terdaftar di Brevo |
+| `BREVO_API_KEY` | API Key dari dashboard Brevo |
+| `MAX_FILE_SIZE` | `10485760` |
+
+Tambahkan variabel berikut di **Railway Dashboard → service frontend → Variables**:
+
+| Variabel | Keterangan |
+|----------|------------|
+| `VITE_API_URL` | URL public backend Railway + `/api` (contoh: `https://backend.up.railway.app/api`) |
+
+> ⚠️ Railway memblokir koneksi SMTP keluar (port 25/465/587) pada paket gratis. Pastikan menggunakan **Brevo REST API** (`BREVO_API_KEY`) — bukan SMTP Gmail — agar pengiriman email OTP berfungsi di production.
 
 
 ---
