@@ -1,5 +1,5 @@
 # Plantaech
-## Analisis Dataset Penyakit Tanaman Tomat
+## Platform berbasis AI untuk identifikasi penyakit tanaman tomat melalui analisis citra daun yang dilengkapi fitur komunitas diskusi.
 
 ## Deskripsi
 
@@ -411,3 +411,66 @@ Pastikan `AI_MODEL_API_URL` di `.env` backend diatur mengarah ke URL public API 
 3. Tambahkan service → set **Root Directory** ke `server`
 4. Tambahkan semua environment variable dari `.env` di dashboard Railway
 5. Untuk frontend: update `VITE_API_URL` ke URL backend Railway, lalu jalankan `npm run build` di dalam `client/`
+
+
+---
+
+## 🤖 Model Machine Learning
+
+Model machine learning Plantaech dikembangkan menggunakan TensorFlow/Keras dengan arsitektur EfficientNetB0 untuk klasifikasi penyakit tanaman tomat berdasarkan citra daun.
+
+### Notebook Pelatihan Model
+
+Notebook pelatihan model tersedia pada:
+
+```text
+ml/notebooks/plantaech.ipynb
+```
+
+### Unduh Model
+
+Model hasil pelatihan disimpan secara terpisah dan dapat diunduh melalui tautan berikut:
+
+🔗 **Model AI:** [Google Drive](https://drive.google.com/file/d/1u6ZLay6iZM0C6m2wt6vSS9gNkwUVwtGu/view?usp=sharing)
+
+### Memuat Model
+
+Setelah model diunduh, letakkan file model pada lokasi yang sesuai dengan konfigurasi layanan FastAPI AI.
+
+Contoh:
+
+```text
+ml/
+├── models/
+│   └── best_model.keras
+```
+
+Model kemudian dimuat menggunakan TensorFlow:
+
+```python
+import tensorflow as tf
+
+model = tf.keras.models.load_model(
+    "models/best_model.keras"
+)
+```
+
+### TensorBoard Logs
+
+Log pelatihan model tersedia pada:
+
+```text
+ml/logs/
+```
+
+Untuk melihat hasil pelatihan menggunakan TensorBoard:
+
+```bash
+tensorboard --logdir ml/logs
+```
+
+TensorBoard akan berjalan pada:
+
+```text
+http://localhost:6006
+```
