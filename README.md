@@ -167,4 +167,4 @@ uvicorn app:app --reload
 
 Endpoint prediksi: `POST /predict` — kirim gambar daun tomat, API mengembalikan nama penyakit dan confidence score.
 
-> 🚀 **Live API:** https://plantaech-ai-model-production.up.railway.app/predict
+> 🚀 **Live API Documentation:** [https://plantaech-ai-model-production.up.railway.app/docs](https://plantaech-ai-model-production.up.railway.app/docs)
